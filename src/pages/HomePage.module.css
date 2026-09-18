@@ -49,3 +49,74 @@
 @media (max-width: 600px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+.userResults {
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.resultsTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--grey-500);
+  margin-bottom: 8px;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  text-decoration: none;
+  color: var(--black);
+  margin-bottom: 8px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.userCard:hover {
+  background: var(--grey-100);
+  border-color: var(--grey-300);
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.userInfo strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.userInfo span {
+  font-size: 12px;
+  color: var(--grey-500);
+}
