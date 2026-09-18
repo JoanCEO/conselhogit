@@ -39,19 +39,20 @@ export default function Layout() {
             O CONSELHO BLAZE
           </Link>
 
-          {/* NAVEGAÇÃO DESKTOP */}
-          <nav className={styles.nav}>
-            <Link to="/" className={styles.navLink}>
-              Avaliações
-            </Link>
-
-            <Link to="/convocacoes" className={styles.navLink}>
-              Convocações
-            </Link>
-          </nav>
 
           {/* LADO DIREITO */}
           <div className={styles.headerRight}>
+
+            {/* NAVEGAÇÃO DESKTOP */}
+          <nav className={styles.nav}>
+              <Link to="/" className={styles.navLink}>
+                Avaliações
+              </Link>
+
+              <Link to="/convocacoes" className={styles.navLink}>
+                Convocações
+              </Link>
+          </nav>
 
             {/* AVATAR */}
             <div
