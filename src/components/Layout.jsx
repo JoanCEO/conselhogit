@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { PlusIcon, UserIcon, LogOutIcon, XIcon } from './Icons'
 import ReviewModal from './ReviewModal'
-import NotificationBell from './NotificationBell'
 import styles from './Layout.module.css'
 
 const HamburgerIcon = ({ open }) => (
