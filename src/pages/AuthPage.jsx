@@ -54,7 +54,7 @@ export default function AuthPage() {
           {mode === 'signup' && (
             <>
               <div className={styles.field}>
-                <label>Nome completo</label>
+                <label>Nome de exibição</label>
                 <input type="text" placeholder="Seu nome" value={form.full_name} onChange={e => set('full_name', e.target.value)} className={styles.input} />
               </div>
               <div className={styles.field}>
