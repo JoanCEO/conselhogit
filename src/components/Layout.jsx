@@ -24,6 +24,7 @@ export default function Layout() {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Link to="/" className={styles.logo}>O CONSELHO BLAZE</Link>
+           <span className={styles.beta}>BETA 0.1</span>
           <div className={styles.headerRight}>
             <button className={styles.themeBtn} onClick={toggle} title="Alternar tema">
               {dark ? <SunIcon size={18} /> : <MoonIcon size={18} />}

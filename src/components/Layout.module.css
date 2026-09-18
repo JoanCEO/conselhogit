@@ -17,6 +17,8 @@
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--black);
+  display: flex;          /* ← linha nova */
+  align-items: flex-start; /* ← linha nova */
 }
 
 .headerRight { display: flex; align-items: center; gap: 12px; }
@@ -89,3 +91,14 @@
   flex-shrink: 0;
 }
 .themeBtn:hover { background: var(--grey-200); transform: scale(1.08); }
+
+.beta {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--grey-400);
+  align-self: flex-start;
+  margin-top: 4px;
+  margin-left: 6px;
+}
