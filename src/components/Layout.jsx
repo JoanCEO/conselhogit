@@ -4,12 +4,15 @@ import { useAuth } from '../lib/AuthContext'
 import { PlusIcon, UserIcon, LogOutIcon } from './Icons'
 import ReviewModal from './ReviewModal'
 import styles from './Layout.module.css'
+import { useTheme } from '../lib/ThemeContext'
+import { MoonIcon, SunIcon } from './Icons'
 
 export default function Layout() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [showModal, setShowModal] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  const { dark, toggle } = useTheme()
 
   const handleSignOut = async () => {
     await signOut()
@@ -22,6 +25,9 @@ export default function Layout() {
         <div className={styles.headerInner}>
           <Link to="/" className={styles.logo}>O CONSELHO BLAZE</Link>
           <div className={styles.headerRight}>
+            <button className={styles.themeBtn} onClick={toggle} title="Alternar tema">
+              {dark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+            </button>
             <div className={styles.avatarWrap} onClick={() => setShowMenu(v => !v)}>
               <div className={styles.avatar}>
                 {profile?.avatar_url

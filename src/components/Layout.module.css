@@ -80,3 +80,12 @@
   .headerInner { padding: 16px; }
   .main { padding: 24px 16px; }
 }
+
+.themeBtn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--grey-100); color: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition), transform var(--transition);
+  flex-shrink: 0;
+}
+.themeBtn:hover { background: var(--grey-200); transform: scale(1.08); }
