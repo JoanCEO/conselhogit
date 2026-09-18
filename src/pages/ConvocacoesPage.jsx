@@ -61,11 +61,32 @@ export default function ConvocacoesPage() {
   const [editItem, setEditItem] = useState(null)
 
   const fetch = useCallback(async () => {
-    const { data } = await supabase
+    // Busca convocacoes sem join (evita problema de FK não declarada)
+    const { data: convs } = await supabase
       .from('convocacoes')
-      .select('*, profiles:autor_id(username, avatar_url)')
+      .select('*')
       .order('criado_em', { ascending: false })
-    setItems((data || []).map(c => ({ ...c, username: c.profiles?.username, avatar_url: c.profiles?.avatar_url })))
+
+    if (!convs || convs.length === 0) {
+      setItems([])
+      setLoading(false)
+      return
+    }
+
+    // Busca perfis separadamente
+    const autorIds = [...new Set(convs.map(c => c.autor_id))]
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url')
+      .in('id', autorIds)
+
+    const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]))
+
+    setItems(convs.map(c => ({
+      ...c,
+      username: profileMap[c.autor_id]?.username || 'Membro',
+      avatar_url: profileMap[c.autor_id]?.avatar_url || null,
+    })))
     setLoading(false)
   }, [])
 
@@ -98,7 +119,7 @@ export default function ConvocacoesPage() {
         )}
       </div>
 
-      {(showForm) && (
+      {showForm && (
         <ConvocacaoForm onSave={() => { setShowForm(false); fetch() }} onCancel={() => setShowForm(false)} />
       )}
       {editItem && (
