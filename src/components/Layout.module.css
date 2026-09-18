@@ -17,9 +17,15 @@
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--black);
-  display: flex;          /* ← linha nova */
-  align-items: flex-start; /* ← linha nova */
 }
+
+.nav { display: flex; gap: 4px; }
+.navLink {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; color: var(--grey-500);
+  transition: all var(--transition);
+}
+.navLink:hover { color: var(--black); background: var(--grey-100); }
 
 .headerRight { display: flex; align-items: center; gap: 12px; }
 
@@ -81,24 +87,4 @@
 @media (max-width: 600px) {
   .headerInner { padding: 16px; }
   .main { padding: 24px 16px; }
-}
-
-.themeBtn {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--grey-100); color: var(--black);
-  display: flex; align-items: center; justify-content: center;
-  transition: background var(--transition), transform var(--transition);
-  flex-shrink: 0;
-}
-.themeBtn:hover { background: var(--grey-200); transform: scale(1.08); }
-
-.beta {
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: var(--grey-400);
-  align-self: flex-start;
-  margin-top: 4px;
-  margin-left: 6px;
 }

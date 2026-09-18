@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import ReviewPage from './pages/ReviewPage'
 import ProfilePage from './pages/ProfilePage'
+import ConvocacoesPage from './pages/ConvocacoesPage'
 import AuthPage from './pages/AuthPage'
 import LoadingScreen from './components/LoadingScreen'
 
@@ -29,6 +30,7 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="review/:id" element={<ReviewPage />} />
         <Route path="profile/:id" element={<ProfilePage />} />
+        <Route path="convocacoes" element={<ConvocacoesPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

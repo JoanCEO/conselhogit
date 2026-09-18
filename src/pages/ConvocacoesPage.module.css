@@ -1,0 +1,108 @@
+.page { max-width: 720px; margin: 0 auto; }
+
+.header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 36px; gap: 16px; flex-wrap: wrap; }
+.title { font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+.sub { font-size: 14px; color: var(--grey-400); margin-top: 4px; }
+
+.newBtn {
+  padding: 10px 20px; border-radius: var(--radius);
+  background: var(--black); color: var(--white);
+  font-size: 14px; font-weight: 600;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+.newBtn:hover { background: var(--grey-600); }
+
+/* Form */
+.formCard {
+  border: 1px solid var(--black); border-radius: var(--radius-md);
+  padding: 28px; margin-bottom: 32px;
+  display: flex; flex-direction: column; gap: 16px;
+  animation: fadeUp 0.2s ease;
+}
+.formHead { display: flex; align-items: center; justify-content: space-between; }
+.formHead h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+
+.input, .textarea {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid var(--grey-200); border-radius: var(--radius);
+  font-size: 14px; color: var(--black); font-family: var(--font-body);
+  outline: none; transition: border-color var(--transition); background: var(--white);
+}
+.input:focus, .textarea:focus { border-color: var(--black); }
+.textarea { resize: vertical; min-height: 120px; }
+
+.error { font-size: 13px; color: #dc2626; }
+
+.formActions { display: flex; justify-content: flex-end; gap: 10px; }
+.cancelBtn {
+  padding: 9px 18px; border-radius: var(--radius);
+  font-size: 13px; color: var(--grey-500);
+  border: 1px solid var(--grey-200); background: var(--white);
+  transition: all var(--transition);
+}
+.cancelBtn:hover { color: var(--black); border-color: var(--black); }
+.submitBtn {
+  padding: 9px 22px; border-radius: var(--radius);
+  background: var(--black); color: var(--white);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  transition: background var(--transition);
+}
+.submitBtn:hover:not(:disabled) { background: var(--grey-600); }
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* List */
+.list { display: flex; flex-direction: column; gap: 16px; }
+
+.card {
+  border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+  padding: 28px;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  animation: fadeUp 0.25s ease;
+}
+.card:hover { border-color: var(--black); box-shadow: 3px 3px 0 var(--black); }
+
+.cardTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.cardTitle { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; }
+
+.cardActions { display: flex; gap: 6px; flex-shrink: 0; }
+.iconBtn {
+  width: 30px; height: 30px; border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--grey-400); border: 1px solid var(--grey-200);
+  transition: all var(--transition);
+}
+.iconBtn:hover { color: var(--black); border-color: var(--black); }
+.iconBtn.danger:hover { color: #dc2626; border-color: #dc2626; }
+
+.cardContent { font-size: 15px; color: var(--grey-600); line-height: 1.7; white-space: pre-wrap; }
+
+.cardFooter {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+  padding-top: 14px; border-top: 1px solid var(--grey-100);
+}
+
+.authorRow { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--black); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; overflow: hidden; flex-shrink: 0;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.authorName { font-size: 13px; color: var(--grey-500); }
+.authorName strong { color: var(--black); }
+.date { font-size: 12px; color: var(--grey-400); }
+
+.center { display: flex; justify-content: center; padding: 80px 0; color: var(--grey-300); }
+.empty { text-align: center; padding: 80px 0; }
+.empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.empty span { font-size: 14px; color: var(--grey-400); }
+
+@media (max-width: 600px) {
+  .card { padding: 20px; }
+  .cardTitle { font-size: 17px; }
+}
