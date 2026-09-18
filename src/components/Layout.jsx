@@ -35,8 +35,9 @@ export default function Layout() {
         <div className={styles.headerInner}>
 
           {/* LOGO */}
-          <Link to="/" className={styles.logo}>
-            O CONSELHO BLAZE
+          <Link to="/" className={styles.logoWrap}>
+            <span className={styles.logo}>O CONSELHO BLAZE</span>
+            <span className={styles.version}>BETA 0.1</span>
           </Link>
 
 
