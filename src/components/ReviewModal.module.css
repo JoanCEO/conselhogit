@@ -6,14 +6,7 @@
   animation: fadeIn 0.15s ease;
 }
 
-.modal {
-  background: var(--white);
-  border: 1px solid var(--black);
-  border-radius: var(--radius-md);
-  width: 100%; max-width: 520px;
-  max-height: 90vh; overflow-y: auto;
-  animation: fadeUp 0.2s ease;
-}
+.modal { background: var(--white); border: 1px solid var(--black); border-radius: var(--radius-md); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; overflow-x: visible; animation: fadeUp 0.2s ease; }
 
 .modalHead {
   display: flex; align-items: center; justify-content: space-between;
@@ -148,6 +141,36 @@
 .gameInfo span {
   font-size: 12px;
   opacity: 0.5;
+}
+
+@media (max-width: 480px) {
+  .gameResults {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 9999;
+  }
+
+  .gameResult {
+    padding: 12px;
+  }
+
+  .gameImage,
+  .gameImagePlaceholder {
+    width: 45px;
+    height: 58px;
+  }
+
+  .gameInfo strong {
+    font-size: 13px;
+  }
+
+  .gameInfo span {
+    font-size: 11px;
+  }
 }
 
 
