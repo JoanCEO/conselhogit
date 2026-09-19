@@ -68,3 +68,86 @@
 .submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+.gameSearch {
+  position: relative;
+}
+
+.gameSearchLoading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.gameResults {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  background: #151515;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.gameResult {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 0;
+  border-bottom: 1px solid #252525;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gameResult:last-child {
+  border-bottom: 0;
+}
+
+.gameResult:hover {
+  background: #202020;
+}
+
+.gameImage,
+.gameImagePlaceholder {
+  width: 48px;
+  height: 62px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.gameImagePlaceholder {
+  background: #252525;
+}
+
+.gameInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gameInfo strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gameInfo span {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+

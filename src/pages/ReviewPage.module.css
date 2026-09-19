@@ -167,3 +167,15 @@
   .reactionBar { gap: 6px; }
   .reactionBtn span { display: none; }
 }
+
+.gameCover {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+

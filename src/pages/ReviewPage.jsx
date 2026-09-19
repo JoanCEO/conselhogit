@@ -11,7 +11,7 @@ function Stars({ rating }) {
   const half = rating % 2 >= 1
   return (
     <span className={styles.stars}>
-      {[0,1,2,3,4].map(i => (
+      {[0, 1, 2, 3, 4].map(i => (
         <StarIcon key={i} size={18} filled={i < full || (i === full && half)} />
       ))}
     </span>
@@ -119,13 +119,7 @@ export default function ReviewPage() {
           )}
         </div>
 
-        <div className={styles.ratingRow}>
-          <div className={styles.ratingBig} style={{ color: ratingColor }}>{review.rating.toFixed(1)}</div>
-          <div>
-            <h1 className={styles.gameName}>{review.game_name}</h1>
-            <Stars rating={review.rating} />
-          </div>
-        </div>
+        <div className={styles.ratingRow}> {review.game_image && (<img src={review.game_image} alt={`Capa de ${review.game_name}`} className={styles.gameCover} />)} <div className={styles.ratingBig} style={{ color: ratingColor }}> {review.rating.toFixed(1)} </div> <div> <h1 className={styles.gameName}>{review.game_name}</h1> <Stars rating={review.rating} /> </div> </div>
 
         <p className={styles.comment}>{review.comment}</p>
 
