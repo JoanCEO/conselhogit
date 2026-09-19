@@ -50,7 +50,12 @@
   margin-bottom: 8px;
 }
 
-.stars { display: flex; gap: 4px; color: var(--grey-400); }
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #f5b301;
+}
 
 .comment { font-size: 16px; line-height: 1.7; color: var(--grey-600); }
 

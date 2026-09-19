@@ -36,8 +36,12 @@
   line-height: 1.2; letter-spacing: -0.3px;
 }
 
-.stars { display: flex; gap: 2px; color: var(--grey-400); }
-
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #f5b301;
+}
 .comment {
   font-size: 14px; color: var(--grey-600); line-height: 1.6;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
