@@ -98,3 +98,32 @@
   .profileCard { flex-direction: column; padding: 24px; }
   .grid { grid-template-columns: 1fr; }
 }
+
+
+.input,
+.textarea {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+  border: 1px solid var(--grey-700);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--grey-400);
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--white);
+}
+
+.textarea {
+  resize: vertical;
+}
+
+
