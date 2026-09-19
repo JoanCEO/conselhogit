@@ -103,9 +103,9 @@
 .input,
 .textarea {
   width: 100%;
-  background: var(--black);
-  color: var(--white);
-  border: 1px solid var(--grey-700);
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
   border-radius: var(--radius);
   padding: 10px 12px;
   font-size: 14px;
@@ -114,16 +114,20 @@
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--grey-400);
+  color: #aaa;
 }
 
 .input:focus,
 .textarea:focus {
-  border-color: var(--white);
+  background: #000;
+  color: #fff;
+  border-color: #fff;
 }
 
 .textarea {
   resize: vertical;
 }
+
+
 
 
