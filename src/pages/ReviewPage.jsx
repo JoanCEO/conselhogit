@@ -235,15 +235,36 @@ export default function ReviewPage() {
 
   const isOwner = user?.id === review.user_id
 
-  // Até 5 pessoas para aparecerem visualmente
-  const visibleReactionPeople = reactions
-    .filter(r => r.profiles)
-    .slice(0, 5)
+  /*
+   * Cada usuário deve aparecer apenas uma vez
+   * nos avatares, mesmo que tenha várias reações.
+   *
+   * Exemplo:
+   * João -> Curtir
+   * João -> Incrível
+   * João -> Concordo
+   *
+   * Continua sendo apenas 1 pessoa visualmente.
+   */
+  const uniqueReactionPeople = Array.from(
+    new Map(
+      reactions
+        .filter(r => r.profiles)
+        .map(r => [r.user_id, r.profiles])
+    ).values()
+  )
 
+  // Até 5 usuários diferentes aparecem visualmente
+  const visibleReactionPeople = uniqueReactionPeople.slice(0, 5)
+
+  // Quantidade de usuários além dos 5 avatares exibidos
   const extraReactionCount = Math.max(
-    reactions.length - visibleReactionPeople.length,
+    uniqueReactionPeople.length - visibleReactionPeople.length,
     0
   )
+
+  // Quantidade real de pessoas que reagiram
+  const uniqueReactionCount = uniqueReactionPeople.length
 
   return (
     <div className={styles.page}>
@@ -315,7 +336,7 @@ export default function ReviewPage() {
 
             <div className={review.platinado ? styles.platinado : styles.naoPlatinado}>
               {review.platinado ? 'PLATINADO' : 'NÃO PLATINADO'}
-          </div>
+            </div>
           </div>
         </div>
 
@@ -398,21 +419,21 @@ export default function ReviewPage() {
           <div className={styles.reactionPeople}>
 
             <div className={styles.reactionAvatars}>
-              {visibleReactionPeople.map(reaction => (
+              {visibleReactionPeople.map(profile => (
                 <Link
-                  key={reaction.id}
-                  to={`/profile/${reaction.profiles.id}`}
+                  key={profile.id}
+                  to={`/profile/${profile.id}`}
                   className={styles.reactionPerson}
-                  title={reaction.profiles.username}
+                  title={profile.username}
                 >
-                  {reaction.profiles.avatar_url ? (
+                  {profile.avatar_url ? (
                     <img
-                      src={reaction.profiles.avatar_url}
-                      alt={reaction.profiles.username}
+                      src={profile.avatar_url}
+                      alt={profile.username}
                     />
                   ) : (
                     <span>
-                      {(reaction.profiles.username || '?')[0].toUpperCase()}
+                      {(profile.username || '?')[0].toUpperCase()}
                     </span>
                   )}
                 </Link>
@@ -426,9 +447,9 @@ export default function ReviewPage() {
             </div>
 
             <span className={styles.reactionPeopleText}>
-              {reactions.length === 1
+              {uniqueReactionCount === 1
                 ? '1 pessoa reagiu'
-                : `${reactions.length} pessoas reagiram`}
+                : `${uniqueReactionCount} pessoas reagiram`}
             </span>
 
           </div>
