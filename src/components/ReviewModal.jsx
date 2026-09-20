@@ -19,6 +19,7 @@ export default function ReviewModal({ onClose, existing }) {
     genre: existing?.genre || '',
     rating: existing?.rating || '',
     comment: existing?.comment || '',
+    platinado: existing?.platinado ?? false,
   })
 
   const [gameSearch, setGameSearch] = useState(existing?.game_name || '')
@@ -67,35 +68,46 @@ export default function ReviewModal({ onClose, existing }) {
   }, [gameSearch, form.game_name])
 
   const selectGame = (game) => {
-    set('game_name', game.name) 
-    set('game_image', game.background_image || '') 
-    setGameSearch(game.name) 
-    setGames([]) 
+    set('game_name', game.name)
+    set('game_image', game.background_image || '')
+    setGameSearch(game.name)
+    setGames([])
     setShowGames(false)
   }
 
   const handleSubmit = async () => {
     if (!form.game_name || !form.game_type || !form.genre || !form.rating || !form.comment) {
-      setError('Preencha todos os campos.'); return
+      setError('Preencha todos os campos.')
+      return
     }
 
     const rating = parseFloat(form.rating)
 
     if (isNaN(rating) || rating < 0 || rating > 10) {
-      setError('Nota deve ser entre 0 e 10.'); return
+      setError('Nota deve ser entre 0 e 10.')
+      return
     }
 
     setLoading(true)
     setError('')
 
-    const payload = { ...form, rating, user_id: user.id }
+    const payload = {
+      ...form,
+      rating,
+      user_id: user.id
+    }
 
     let res
 
     if (existing) {
-      res = await supabase.from('reviews').update(payload).eq('id', existing.id)
+      res = await supabase
+        .from('reviews')
+        .update(payload)
+        .eq('id', existing.id)
     } else {
-      res = await supabase.from('reviews').insert(payload)
+      res = await supabase
+        .from('reviews')
+        .insert(payload)
     }
 
     setLoading(false)
@@ -243,6 +255,28 @@ export default function ReviewModal({ onClose, existing }) {
               onChange={e => set('rating', e.target.value)}
               className={styles.input}
             />
+          </div>
+
+          <div className={styles.field}>
+            <label>Platinei este jogo?</label>
+
+            <div className={styles.platinumOptions}>
+              <button
+                type="button"
+                className={`${styles.platinumBtn} ${form.platinado === true ? styles.platinumActive : ''}`}
+                onClick={() => set('platinado', true)}
+              >
+                Sim
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.platinumBtn} ${form.platinado === false ? styles.platinumActive : ''}`}
+                onClick={() => set('platinado', false)}
+              >
+                Não
+              </button>
+            </div>
           </div>
 
           <div className={styles.field}>

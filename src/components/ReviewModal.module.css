@@ -173,4 +173,33 @@
   }
 }
 
+.platinumOptions {
+  display: flex;
+  gap: 10px;
+}
+
+.platinumBtn {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--black);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.platinumBtn:hover {
+  border-color: var(--black);
+}
+
+.platinumActive {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+
 

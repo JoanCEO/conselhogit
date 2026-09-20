@@ -312,6 +312,12 @@ export default function ReviewPage() {
             </h1>
 
             <Stars rating={review.rating} />
+
+            {review.platinado && (
+              <div className={styles.platinado}>
+                PLATINADO
+              </div>
+            )}
           </div>
         </div>
 
@@ -581,3 +587,4 @@ export default function ReviewPage() {
     </div>
   )
 }
+
