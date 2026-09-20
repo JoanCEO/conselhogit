@@ -313,11 +313,9 @@ export default function ReviewPage() {
 
             <Stars rating={review.rating} />
 
-            {review.platinado && (
-              <div className={styles.platinado}>
-                PLATINADO
-              </div>
-            )}
+            <div className={review.platinado ? styles.platinado : styles.naoPlatinado}>
+              {review.platinado ? 'PLATINADO' : 'NÃO PLATINADO'}
+          </div>
           </div>
         </div>
 
