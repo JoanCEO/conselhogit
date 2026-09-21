@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
-import { ChevronLeftIcon, SpinnerIcon, EditIcon } from '../components/Icons'
+import {
+  ChevronLeftIcon,
+  SpinnerIcon,
+  EditIcon
+} from '../components/Icons'
 import ReviewCard from '../components/ReviewCard'
 import styles from './ProfilePage.module.css'
 
@@ -14,20 +18,34 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [reviews, setReviews] = useState([])
   const [reactions, setReactions] = useState([])
+
+  const [followersCount, setFollowersCount] = useState(0)
+  const [followingCount, setFollowingCount] = useState(0)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [followLoading, setFollowLoading] = useState(false)
+
+  const [userList, setUserList] = useState([])
+  const [userListType, setUserListType] = useState(null)
+  const [loadingUserList, setLoadingUserList] = useState(false)
+
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
+
   const [form, setForm] = useState({
     username: '',
     full_name: '',
     bio: '',
     avatar_url: ''
   })
+
   const [saving, setSaving] = useState(false)
 
   const isMe = user?.id === id
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true)
+
       const { data: p } = await supabase
         .from('profiles')
         .select('*')
@@ -36,12 +54,14 @@ export default function ProfilePage() {
 
       setProfile(p)
 
-      setForm({
-        username: p?.username || '',
-        full_name: p?.full_name || '',
-        bio: p?.bio || '',
-        avatar_url: p?.avatar_url || ''
-      })
+      if (p) {
+        setForm({
+          username: p.username || '',
+          full_name: p.full_name || '',
+          bio: p.bio || '',
+          avatar_url: p.avatar_url || ''
+        })
+      }
 
       const { data: rv } = await supabase
         .from('reviews')
@@ -67,13 +87,147 @@ export default function ProfilePage() {
           .in('review_id', ids)
 
         setReactions(rcts || [])
+      } else {
+        setReactions([])
+      }
+
+      // Buscar seguidores
+      const { count: followers } = await supabase
+        .from('seguidores')
+        .select('*', {
+          count: 'exact',
+          head: true
+        })
+        .eq('seguido_id', id)
+
+      setFollowersCount(followers || 0)
+
+      // Buscar quem o usuário segue
+      const { count: following } = await supabase
+        .from('seguidores')
+        .select('*', {
+          count: 'exact',
+          head: true
+        })
+        .eq('seguidor_id', id)
+
+      setFollowingCount(following || 0)
+
+      // Verificar se o usuário atual segue este perfil
+      if (user && !isMe) {
+        const { data: follow } = await supabase
+          .from('seguidores')
+          .select('id')
+          .eq('seguidor_id', user.id)
+          .eq('seguido_id', id)
+          .maybeSingle()
+
+        setIsFollowing(!!follow)
+      } else {
+        setIsFollowing(false)
       }
 
       setLoading(false)
     }
 
     fetchProfile()
-  }, [id])
+  }, [id, user?.id])
+
+  const openUserList = async (type) => {
+    setUserListType(type)
+    setLoadingUserList(true)
+    setUserList([])
+
+    const column =
+      type === 'followers'
+        ? 'seguido_id'
+        : 'seguidor_id'
+
+    const targetColumn =
+      type === 'followers'
+        ? 'seguidor_id'
+        : 'seguido_id'
+
+    const { data: follows, error } = await supabase
+      .from('seguidores')
+      .select(targetColumn)
+      .eq(column, id)
+
+    if (error) {
+      console.error(
+        'Erro ao buscar relacionamentos:',
+        error
+      )
+      setLoadingUserList(false)
+      return
+    }
+
+    const userIds = (follows || []).map(
+      item => item[targetColumn]
+    )
+
+    if (!userIds.length) {
+      setUserList([])
+      setLoadingUserList(false)
+      return
+    }
+
+    const { data: profiles, error: profilesError } =
+      await supabase
+        .from('profiles')
+        .select(
+          'id, username, full_name, avatar_url'
+        )
+        .in('id', userIds)
+
+    if (profilesError) {
+      console.error(
+        'Erro ao buscar perfis:',
+        profilesError
+      )
+
+      setUserList([])
+    } else {
+      setUserList(profiles || [])
+    }
+
+    setLoadingUserList(false)
+  }
+
+  const handleFollow = async () => {
+    if (!user || isMe || followLoading) return
+
+    setFollowLoading(true)
+
+    if (isFollowing) {
+      const { error } = await supabase
+        .from('seguidores')
+        .delete()
+        .eq('seguidor_id', user.id)
+        .eq('seguido_id', id)
+
+      if (!error) {
+        setIsFollowing(false)
+        setFollowersCount(prev =>
+          Math.max(0, prev - 1)
+        )
+      }
+    } else {
+      const { error } = await supabase
+        .from('seguidores')
+        .insert({
+          seguidor_id: user.id,
+          seguido_id: id
+        })
+
+      if (!error) {
+        setIsFollowing(true)
+        setFollowersCount(prev => prev + 1)
+      }
+    }
+
+    setFollowLoading(false)
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -105,15 +259,21 @@ export default function ProfilePage() {
   }
 
   const avgRating = reviews.length
-    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+    ? (
+        reviews.reduce((s, r) => s + r.rating, 0) /
+        reviews.length
+      ).toFixed(1)
     : null
 
   const memberSince = profile.created_at
-    ? new Date(profile.created_at).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      })
+    ? new Date(profile.created_at).toLocaleDateString(
+        'pt-BR',
+        {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        }
+      )
     : null
 
   return (
@@ -146,11 +306,12 @@ export default function ProfilePage() {
           <div className={styles.profileInfo}>
 
             <div className={styles.nameRow}>
+
               <h1 className={styles.displayName}>
                 {profile.full_name || profile.username}
               </h1>
 
-              {isMe && (
+              {isMe ? (
                 <button
                   className={styles.editBtn}
                   onClick={() => setEditing(true)}
@@ -158,7 +319,26 @@ export default function ProfilePage() {
                   <EditIcon size={16} />
                   Editar perfil
                 </button>
+              ) : (
+                <button
+                  className={`${styles.followBtn} ${
+                    isFollowing
+                      ? styles.followingBtn
+                      : ''
+                  }`}
+                  onClick={handleFollow}
+                  disabled={followLoading}
+                >
+                  {followLoading ? (
+                    <SpinnerIcon size={15} />
+                  ) : (
+                    isFollowing
+                      ? 'Seguindo'
+                      : 'Seguir'
+                  )}
+                </button>
               )}
+
             </div>
 
             <p className={styles.username}>
@@ -188,6 +368,36 @@ export default function ProfilePage() {
                   avaliações
                 </span>
               </div>
+
+              <button
+                className={styles.statButton}
+                onClick={() =>
+                  openUserList('followers')
+                }
+              >
+                <span className={styles.statNum}>
+                  {followersCount}
+                </span>
+
+                <span className={styles.statLabel}>
+                  seguidores
+                </span>
+              </button>
+
+              <button
+                className={styles.statButton}
+                onClick={() =>
+                  openUserList('following')
+                }
+              >
+                <span className={styles.statNum}>
+                  {followingCount}
+                </span>
+
+                <span className={styles.statLabel}>
+                  seguindo
+                </span>
+              </button>
 
               {avgRating && (
                 <div className={styles.stat}>
@@ -325,7 +535,105 @@ export default function ProfilePage() {
         </p>
       )}
 
+      {userListType && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setUserListType(null)}
+        >
+          <div
+            className={styles.userListModal}
+            onClick={e => e.stopPropagation()}
+          >
+
+            <div className={styles.userListHeader}>
+
+              <div>
+                <h3>
+                  {userListType === 'followers'
+                    ? 'Seguidores'
+                    : 'Seguindo'}
+                </h3>
+
+                <span>
+                  {userList.length}{' '}
+                  {userList.length === 1
+                    ? 'usuário'
+                    : 'usuários'}
+                </span>
+              </div>
+
+              <button
+                className={styles.closeModal}
+                onClick={() =>
+                  setUserListType(null)
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+            <div className={styles.userList}>
+
+              {loadingUserList ? (
+                <div className={styles.userListLoading}>
+                  <SpinnerIcon size={22} />
+                </div>
+              ) : userList.length === 0 ? (
+                <div className={styles.userListEmpty}>
+                  {userListType === 'followers'
+                    ? 'Nenhum seguidor ainda.'
+                    : 'Não segue ninguém ainda.'}
+                </div>
+              ) : (
+                userList.map(profile => (
+                  <button
+                    key={profile.id}
+                    className={styles.userListItem}
+                    onClick={() => {
+                      setUserListType(null)
+                      navigate(
+                        `/profile/${profile.id}`
+                      )
+                    }}
+                  >
+
+                    <div className={styles.userListAvatar}>
+                      {profile.avatar_url ? (
+                        <img
+                          src={profile.avatar_url}
+                          alt=""
+                        />
+                      ) : (
+                        <span>
+                          {(profile.username || '?')[0].toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className={styles.userListInfo}>
+
+                      <strong>
+                        {profile.full_name ||
+                          profile.username}
+                      </strong>
+
+                      <span>
+                        @{profile.username}
+                      </span>
+
+                    </div>
+
+                  </button>
+                ))
+              )}
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
-
