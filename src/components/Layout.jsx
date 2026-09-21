@@ -37,7 +37,7 @@ export default function Layout() {
           {/* LOGO */}
           <Link to="/" className={styles.logoWrap}>
             <span className={styles.logo}>O CONSELHO BLAZE</span>
-            <span className={styles.version}>BETA 0.1</span>
+            <span className={styles.version}>BETA 1.2</span>
           </Link>
 
           {/* LADO DIREITO */}
