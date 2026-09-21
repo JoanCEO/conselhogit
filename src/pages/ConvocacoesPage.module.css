@@ -106,3 +106,37 @@
   .card { padding: 20px; }
   .cardTitle { font-size: 17px; }
 }
+
+.disciplinaryNotice {
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--grey-100);
+  box-sizing: border-box;
+}
+
+.disciplinaryContent strong {
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.disciplinaryContent p {
+  margin: 5px 0 8px;
+  color: var(--black);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.disciplinaryContent span {
+  color: var(--grey-500);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.newBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
