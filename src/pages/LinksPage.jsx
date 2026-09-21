@@ -30,7 +30,60 @@ const LINKS = [
       { name: 'HLTV', desc: 'O maior portal de CS do mundo — rankings, resultados e estatísticas.', url: 'https://hltv.org', tag: 'eSports' },
       { name: 'Liquipedia', desc: 'Wiki de eSports com brackets, times e histórico de torneios.', url: 'https://liquipedia.net', tag: 'eSports' },
     ]
-  }
+  },
+  {
+  category: 'Futebol Brasileiro e Mundial',
+  items: [
+    {
+      name: 'Tabela Brasileirão Série A',
+      desc: 'Tabela atualizada do Brasileirão Série A',
+      url: 'https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026',
+      tag: 'Brasil'
+    },
+    {
+      name: 'Tabela Premier League',
+      desc: 'Tabela atualizada do Campeonato Inglês',
+      url: 'https://www.premierleague.com/en/tables',
+      tag: 'Inglaterra'
+    },
+    {
+      name: 'Tabela La Liga',
+      desc: 'Tabela atualizada do Campeonato Espanhol',
+      url: 'https://www.laliga.com/en-GB/laliga-easports/standing',
+      tag: 'Espanha'
+    },
+    {
+      name: 'Tabela Serie A',
+      desc: 'Tabela atualizada do Campeonato Italiano',
+      url: 'https://www.legaseriea.it/en/serie-a/classifica',
+      tag: 'Itália'
+    },
+    {
+      name: 'Tabela Bundesliga',
+      desc: 'Tabela atualizada do Campeonato Alemão',
+      url: 'https://www.bundesliga.com/en/bundesliga/table',
+      tag: 'Alemanha'
+    },
+    {
+      name: 'Tabela Ligue 1',
+      desc: 'Tabela atualizada do Campeonato Francês',
+      url: 'https://www.ligue1.com/classement',
+      tag: 'França'
+    },
+    {
+      name: 'Tabela Eredivisie',
+      desc: 'Tabela atualizada do Campeonato Holandês',
+      url: 'https://eredivisie.eu/competitie/stand/',
+      tag: 'Holanda'
+    },
+    {
+      name: 'Tabela Primeira Liga',
+      desc: 'Tabela atualizada do Campeonato Português',
+      url: 'https://www.ligaportugal.pt/en/liga/ligameister/tabela',
+      tag: 'Portugal'
+    }
+  ]
+}
 ]
 
 const ExternalIcon = () => (
