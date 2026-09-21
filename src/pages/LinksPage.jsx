@@ -67,7 +67,7 @@ const LINKS = [
     {
       name: 'Tabela Ligue 1',
       desc: 'Tabela atualizada do Campeonato Francês',
-      url: 'https://www.ligue1.com/classement',
+      url: 'https://ligue1.com/en',
       tag: 'França'
     },
     {
