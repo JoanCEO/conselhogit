@@ -1,0 +1,76 @@
+.page { max-width: 900px; margin: 0 auto; }
+
+.pageHead { margin-bottom: 48px; }
+.title { font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+.sub { font-size: 14px; color: var(--grey-400); }
+
+.section { margin-bottom: 48px; }
+
+.categoryTitle {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--grey-400); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--grey-200);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 22px; border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  text-decoration: none; color: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  animation: fadeUp 0.25s ease;
+}
+.card:hover {
+  border-color: var(--black);
+  box-shadow: 3px 3px 0 var(--black);
+}
+
+.cardTop {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 2px;
+  background: var(--black); color: var(--white);
+  margin-bottom: 6px;
+}
+
+.linkName {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 700; line-height: 1.2;
+}
+
+.externalIcon {
+  color: var(--grey-300); flex-shrink: 0; margin-top: 2px;
+  transition: color var(--transition);
+}
+.card:hover .externalIcon { color: var(--black); }
+
+.linkDesc {
+  font-size: 13px; color: var(--grey-500);
+  line-height: 1.6; flex: 1;
+}
+
+.linkUrl {
+  font-size: 11px; color: var(--grey-300);
+  font-family: monospace; letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color var(--transition);
+}
+.card:hover .linkUrl { color: var(--grey-500); }
+
+@media (max-width: 600px) {
+  .title { font-size: 24px; }
+  .grid { grid-template-columns: 1fr; }
+}

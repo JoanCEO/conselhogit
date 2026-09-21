@@ -108,6 +108,14 @@ export default function ProfilePage() {
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : null
 
+  const memberSince = profile.created_at
+    ? new Date(profile.created_at).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      })
+    : null
+
   return (
     <div className={styles.page}>
 
@@ -156,6 +164,12 @@ export default function ProfilePage() {
             <p className={styles.username}>
               @{profile.username}
             </p>
+
+            {memberSince && (
+              <p className={styles.memberSince}>
+                Membro desde {memberSince}
+              </p>
+            )}
 
             {profile.bio && (
               <p className={styles.bio}>
@@ -314,3 +328,4 @@ export default function ProfilePage() {
     </div>
   )
 }
+

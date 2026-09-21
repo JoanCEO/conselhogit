@@ -1,0 +1,819 @@
+.page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* =========================
+   CABEÇALHO
+========================= */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--grey-500);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--black);
+}
+
+.header p {
+  margin: 7px 0 0;
+  color: var(--grey-500);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid var(--grey-200);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--grey-500);
+  white-space: nowrap;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.createButton {
+  padding: 8px 13px;
+  border: 1px solid var(--black);
+  border-radius: var(--radius-md);
+  background: var(--black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.createButton:hover {
+  opacity: 0.85;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+.createCard {
+  margin-bottom: 16px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.createHeader {
+  padding: 20px;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.createHeader h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.createHeader p {
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey-500);
+}
+
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--white);
+  color: var(--black);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: border-color var(--transition);
+}
+
+.field textarea {
+  min-height: 110px;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--black);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--grey-400);
+}
+
+.submitButton {
+  align-self: flex-start;
+  padding: 11px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.submitButton:hover {
+  opacity: 0.85;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================
+   LISTA DE JULGAMENTOS
+========================= */
+
+.subject {
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--grey-500);
+}
+
+.subject h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.subject p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey-500);
+}
+
+.julgamentoList {
+  margin-top: 4px;
+}
+
+.julgamentoItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border: none;
+  border-bottom: 1px solid var(--grey-200);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+
+.julgamentoItem:last-child {
+  border-bottom: none;
+}
+
+.julgamentoItem:hover h2 {
+  text-decoration: underline;
+}
+
+.julgamentoItem h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.julgamentoItem p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey-500);
+}
+
+.julgamentoStatus {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border: 1px solid var(--grey-200);
+  border-radius: 20px;
+  font-size: 10px;
+  color: var(--grey-500);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.backButton {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.backButton:hover {
+  background: var(--grey-100);
+}
+
+/* =========================
+   MEMBRO / CRIADOR
+========================= */
+
+.memberBar {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.memberAvatar {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.memberAvatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.memberInfo strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberInfo span {
+  font-size: 11px;
+  color: var(--grey-500);
+}
+
+/* =========================
+   CONTEÚDO
+========================= */
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.voteCard,
+.chatCard {
+  min-width: 0;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+}
+
+/* =========================
+   VOTAÇÃO
+========================= */
+
+.cardHeader {
+  padding: 20px;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.cardHeader h3,
+.chatHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.voteButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 20px;
+}
+
+.voteButtons button {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+/* Botões normais: SIM e NÃO iguais */
+
+.voteButton {
+  border: 1px solid var(--grey-200);
+  background: var(--white);
+  color: var(--black);
+}
+
+.voteButton:hover:not(:disabled) {
+  background: var(--grey-100);
+}
+
+/* Voto escolhido pelo usuário */
+
+.voteSelected {
+  border-color: var(--black);
+  background: var(--black);
+  color: var(--white);
+}
+
+.voteSelected:hover:not(:disabled) {
+  background: var(--black);
+  color: var(--white);
+}
+
+.voteButtons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.results {
+  padding: 0 20px 20px;
+}
+
+.result {
+  margin-bottom: 13px;
+}
+
+.result:last-child {
+  margin-bottom: 0;
+}
+
+.resultTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--grey-500);
+}
+
+.resultTop strong {
+  color: var(--black);
+  white-space: nowrap;
+}
+
+.progress {
+  width: 100%;
+  height: 5px;
+  border-radius: 10px;
+  background: var(--grey-100);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--black);
+  transition: width 0.25s ease;
+}
+
+.voteLog {
+  padding: 18px 20px;
+  border-top: 1px solid var(--grey-200);
+}
+
+.voteLogTitle {
+  margin-bottom: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--grey-500);
+}
+
+.voteItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--grey-500);
+}
+
+.voteItem:last-child {
+  margin-bottom: 0;
+}
+
+.voteItem strong {
+  color: var(--black);
+}
+
+/* =========================
+   CHAT
+========================= */
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 20px;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.online {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--grey-500);
+  white-space: nowrap;
+}
+
+.messages {
+  min-height: 360px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.message:last-child {
+  margin-bottom: 0;
+}
+
+.messageAvatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.messageAvatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 3px;
+}
+
+.messageMeta strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.messageMeta span {
+  font-size: 10px;
+  color: var(--grey-400);
+}
+
+.message p {
+  max-width: 100%;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey-500);
+  overflow-wrap: anywhere;
+}
+
+.chatInput {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--grey-200);
+}
+
+.chatInput input {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--white);
+  color: var(--black);
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color var(--transition);
+}
+
+.chatInput input:focus {
+  border-color: var(--black);
+}
+
+.chatInput input::placeholder {
+  color: var(--grey-400);
+}
+
+.chatInput input:disabled {
+  opacity: 0.6;
+}
+
+.chatInput button {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.chatInput button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.chatInput button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================
+   ESTADOS VAZIOS
+========================= */
+
+.emptyState {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--grey-400);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .page {
+    padding-bottom: 24px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .subject {
+    padding: 18px;
+  }
+
+  .julgamentoItem {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .julgamentoStatus {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .header h1 {
+    font-size: 25px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .headerActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status {
+    width: fit-content;
+  }
+
+  .createButton {
+    width: 100%;
+  }
+
+  .createHeader,
+  .createForm {
+    padding: 16px;
+  }
+
+  .voteButtons {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .results {
+    padding: 0 16px 16px;
+  }
+
+  .voteLog {
+    padding: 16px;
+  }
+
+  .cardHeader,
+  .chatHeader {
+    padding: 16px;
+  }
+
+  .messages {
+    min-height: 300px;
+    max-height: 420px;
+    padding: 16px;
+  }
+
+  .chatInput {
+    padding: 10px;
+  }
+
+  .chatInput input {
+    min-width: 0;
+  }
+
+  .chatInput button {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding-bottom: 20px;
+  }
+
+  .subject {
+    padding: 16px;
+  }
+
+  .subject h2 {
+    font-size: 19px;
+  }
+
+  .julgamentoItem h2 {
+    font-size: 16px;
+  }
+
+  .memberBar {
+    padding: 12px;
+  }
+
+  .message {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .messageAvatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .message p {
+    font-size: 12px;
+  }
+
+  .chatInput {
+    gap: 6px;
+  }
+
+  .chatInput button {
+    padding: 10px;
+  }
+}

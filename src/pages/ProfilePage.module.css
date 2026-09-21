@@ -145,5 +145,11 @@
   display: block;
 }
 
+.memberSince { 
+  margin: 4px 0 12px; 
+  color: #888; 
+  font-size: 13px; 
+}
+
 
 

@@ -40,12 +40,12 @@ export default function Layout() {
             <span className={styles.version}>BETA 0.1</span>
           </Link>
 
-
           {/* LADO DIREITO */}
           <div className={styles.headerRight}>
 
             {/* NAVEGAÇÃO DESKTOP */}
-          <nav className={styles.nav}>
+            <nav className={styles.nav}>
+
               <Link to="/" className={styles.navLink}>
                 Avaliações
               </Link>
@@ -53,7 +53,16 @@ export default function Layout() {
               <Link to="/convocacoes" className={styles.navLink}>
                 Convocações
               </Link>
-          </nav>
+
+              <Link to="/julgamento" className={styles.navLink}>
+                Julgamento
+              </Link>
+
+              <Link to="/links" className={styles.navLink}>
+                Links
+              </Link>
+
+            </nav>
 
             {/* AVATAR */}
             <div
@@ -142,6 +151,23 @@ export default function Layout() {
               Convocações
             </Link>
 
+            <Link
+              to="/julgamento"
+              className={styles.mobileMenuItem}
+              onClick={closeMobileMenu}
+            >
+              Julgamento
+            </Link>
+
+            <Link
+              to="/links"
+              className={styles.mobileMenuItem}
+              onClick={closeMobileMenu}
+            >
+              Links
+            </Link>
+
+
             <button
               className={styles.mobileMenuItem}
               onClick={() => {
@@ -186,3 +212,4 @@ export default function Layout() {
     </div>
   )
 }
+
