@@ -71,12 +71,6 @@ const LINKS = [
       tag: 'França'
     },
     {
-      name: 'Tabela Eredivisie',
-      desc: 'Tabela atualizada do Campeonato Holandês',
-      url: 'https://eredivisie.eu/competitie/stand/',
-      tag: 'Holanda'
-    },
-    {
       name: 'Tabela Primeira Liga',
       desc: 'Tabela atualizada do Campeonato Português',
       url: 'https://www.ligaportugal.pt/en/liga/ligameister/tabela',
