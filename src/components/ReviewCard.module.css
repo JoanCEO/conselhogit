@@ -85,3 +85,77 @@
 }
 .reactionBtn:hover { color: var(--black); border-color: var(--grey-300); }
 .reactionBtn.active { color: var(--black); border-color: var(--black); background: var(--grey-100); }
+
+/* =========================================
+   SPOILER
+   ========================================= */
+
+.spoilerComment {
+  position: relative;
+  width: 100%;
+  min-height: 70px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.spoilerText {
+  display: block;
+  padding: 2px 0;
+  filter: blur(7px);
+  opacity: 0.65;
+  user-select: none;
+  transition:
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.spoilerOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #000;
+  text-align: center;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.25s ease;
+}
+
+.spoilerOverlay strong {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.spoilerOverlay span {
+  font-size: 10px;
+  color: #555;
+}
+
+.spoilerComment:hover .spoilerOverlay {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.spoilerRevealed {
+  cursor: default;
+}
+
+.spoilerRevealed .spoilerText {
+  filter: none;
+  opacity: 1;
+  user-select: text;
+}
+
+.spoilerRevealed .spoilerOverlay {
+  display: none;
+}

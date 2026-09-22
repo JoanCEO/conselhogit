@@ -4,8 +4,31 @@ import { useAuth } from '../lib/AuthContext'
 import { XIcon, SpinnerIcon } from './Icons'
 import styles from './ReviewModal.module.css'
 
-const GENRES = ['RPG', 'FPS', 'Ação', 'Aventura', 'Estratégia', 'Terror', 'Corrida', 'Esporte', 'Plataforma', 'Puzzle', 'Simulação', 'MOBA', 'MMO', 'Outros']
-const TYPES = ['Online', 'Multiplayer', 'História', 'Co-op', 'Competitivo', 'Battle Royale']
+const GENRES = [
+  'RPG',
+  'FPS',
+  'Ação',
+  'Aventura',
+  'Estratégia',
+  'Terror',
+  'Corrida',
+  'Esporte',
+  'Plataforma',
+  'Puzzle',
+  'Simulação',
+  'MOBA',
+  'MMO',
+  'Outros'
+]
+
+const TYPES = [
+  'Online',
+  'Multiplayer',
+  'História',
+  'Co-op',
+  'Competitivo',
+  'Battle Royale'
+]
 
 const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY
 
@@ -20,9 +43,13 @@ export default function ReviewModal({ onClose, existing }) {
     rating: existing?.rating || '',
     comment: existing?.comment || '',
     platinado: existing?.platinado ?? false,
+    spoiler: existing?.spoiler ?? false,
   })
 
-  const [gameSearch, setGameSearch] = useState(existing?.game_name || '')
+  const [gameSearch, setGameSearch] = useState(
+    existing?.game_name || ''
+  )
+
   const [games, setGames] = useState([])
   const [searchingGames, setSearchingGames] = useState(false)
   const [showGames, setShowGames] = useState(false)
@@ -30,10 +57,18 @@ export default function ReviewModal({ onClose, existing }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const set = (key, value) => {
+    setForm(current => ({
+      ...current,
+      [key]: value
+    }))
+  }
 
   useEffect(() => {
-    if (gameSearch.trim().length < 2 || gameSearch === form.game_name) {
+    if (
+      gameSearch.trim().length < 2 ||
+      gameSearch === form.game_name
+    ) {
       setGames([])
       setShowGames(false)
       return
@@ -44,7 +79,9 @@ export default function ReviewModal({ onClose, existing }) {
         setSearchingGames(true)
 
         const response = await fetch(
-          `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(gameSearch.trim())}&page_size=5`
+          `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(
+            gameSearch.trim()
+          )}&page_size=5`
         )
 
         if (!response.ok) {
@@ -67,7 +104,7 @@ export default function ReviewModal({ onClose, existing }) {
     return () => clearTimeout(timer)
   }, [gameSearch, form.game_name])
 
-  const selectGame = (game) => {
+  const selectGame = game => {
     set('game_name', game.name)
     set('game_image', game.background_image || '')
     setGameSearch(game.name)
@@ -76,14 +113,24 @@ export default function ReviewModal({ onClose, existing }) {
   }
 
   const handleSubmit = async () => {
-    if (!form.game_name || !form.game_type || !form.genre || !form.rating || !form.comment) {
+    if (
+      !form.game_name ||
+      !form.game_type ||
+      !form.genre ||
+      !form.rating ||
+      !form.comment
+    ) {
       setError('Preencha todos os campos.')
       return
     }
 
     const rating = parseFloat(form.rating)
 
-    if (isNaN(rating) || rating < 0 || rating > 10) {
+    if (
+      isNaN(rating) ||
+      rating < 0 ||
+      rating > 10
+    ) {
       setError('Nota deve ser entre 0 e 10.')
       return
     }
@@ -123,16 +170,21 @@ export default function ReviewModal({ onClose, existing }) {
   return (
     <div
       className={styles.overlay}
-      onClick={e => e.target === e.currentTarget && onClose()}
+      onClick={e =>
+        e.target === e.currentTarget && onClose()
+      }
     >
       <div className={styles.modal}>
 
         <div className={styles.modalHead}>
           <h2 className={styles.modalTitle}>
-            {existing ? 'Editar avaliação' : 'Nova avaliação'}
+            {existing
+              ? 'Editar avaliação'
+              : 'Nova avaliação'}
           </h2>
 
           <button
+            type="button"
             className={styles.closeBtn}
             onClick={() => onClose()}
           >
@@ -153,6 +205,7 @@ export default function ReviewModal({ onClose, existing }) {
                 onChange={e => {
                   setGameSearch(e.target.value)
                   set('game_name', '')
+                  set('game_image', '')
                 }}
                 onFocus={() => {
                   if (games.length > 0) {
@@ -185,7 +238,11 @@ export default function ReviewModal({ onClose, existing }) {
                           className={styles.gameImage}
                         />
                       ) : (
-                        <div className={styles.gameImagePlaceholder} />
+                        <div
+                          className={
+                            styles.gameImagePlaceholder
+                          }
+                        />
                       )}
 
                       <div className={styles.gameInfo}>
@@ -205,19 +262,22 @@ export default function ReviewModal({ onClose, existing }) {
           </div>
 
           <div className={styles.row}>
+
             <div className={styles.field}>
               <label>Tipo</label>
 
               <select
                 value={form.game_type}
-                onChange={e => set('game_type', e.target.value)}
+                onChange={e =>
+                  set('game_type', e.target.value)
+                }
                 className={styles.select}
               >
                 <option value="">Selecionar</option>
 
-                {TYPES.map(t => (
-                  <option key={t} value={t}>
-                    {t}
+                {TYPES.map(type => (
+                  <option key={type} value={type}>
+                    {type}
                   </option>
                 ))}
               </select>
@@ -228,18 +288,21 @@ export default function ReviewModal({ onClose, existing }) {
 
               <select
                 value={form.genre}
-                onChange={e => set('genre', e.target.value)}
+                onChange={e =>
+                  set('genre', e.target.value)
+                }
                 className={styles.select}
               >
                 <option value="">Selecionar</option>
 
-                {GENRES.map(g => (
-                  <option key={g} value={g}>
-                    {g}
+                {GENRES.map(genre => (
+                  <option key={genre} value={genre}>
+                    {genre}
                   </option>
                 ))}
               </select>
             </div>
+
           </div>
 
           <div className={styles.field}>
@@ -252,7 +315,9 @@ export default function ReviewModal({ onClose, existing }) {
               step="0.5"
               placeholder="Ex: 8.5"
               value={form.rating}
-              onChange={e => set('rating', e.target.value)}
+              onChange={e =>
+                set('rating', e.target.value)
+              }
               className={styles.input}
             />
           </div>
@@ -263,16 +328,62 @@ export default function ReviewModal({ onClose, existing }) {
             <div className={styles.platinumOptions}>
               <button
                 type="button"
-                className={`${styles.platinumBtn} ${form.platinado === true ? styles.platinumActive : ''}`}
-                onClick={() => set('platinado', true)}
+                className={`${styles.platinumBtn} ${
+                  form.platinado === true
+                    ? styles.platinumActive
+                    : ''
+                }`}
+                onClick={() =>
+                  set('platinado', true)
+                }
               >
                 Sim
               </button>
 
               <button
                 type="button"
-                className={`${styles.platinumBtn} ${form.platinado === false ? styles.platinumActive : ''}`}
-                onClick={() => set('platinado', false)}
+                className={`${styles.platinumBtn} ${
+                  form.platinado === false
+                    ? styles.platinumActive
+                    : ''
+                }`}
+                onClick={() =>
+                  set('platinado', false)
+                }
+              >
+                Não
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <label>Esta avaliação contém spoiler?</label>
+
+            <div className={styles.platinumOptions}>
+              <button
+                type="button"
+                className={`${styles.platinumBtn} ${
+                  form.spoiler === true
+                    ? styles.platinumActive
+                    : ''
+                }`}
+                onClick={() =>
+                  set('spoiler', true)
+                }
+              >
+                Sim
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.platinumBtn} ${
+                  form.spoiler === false
+                    ? styles.platinumActive
+                    : ''
+                }`}
+                onClick={() =>
+                  set('spoiler', false)
+                }
               >
                 Não
               </button>
@@ -285,7 +396,9 @@ export default function ReviewModal({ onClose, existing }) {
             <textarea
               placeholder="Escreva sua avaliação..."
               value={form.comment}
-              onChange={e => set('comment', e.target.value)}
+              onChange={e =>
+                set('comment', e.target.value)
+              }
               className={styles.textarea}
               rows={5}
             />
@@ -298,15 +411,18 @@ export default function ReviewModal({ onClose, existing }) {
           )}
 
           <button
+            type="button"
             className={styles.submitBtn}
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading
-              ? <SpinnerIcon size={18} />
-              : existing
-                ? 'Salvar alterações'
-                : 'Publicar avaliação'}
+            {loading ? (
+              <SpinnerIcon size={18} />
+            ) : existing ? (
+              'Salvar alterações'
+            ) : (
+              'Publicar avaliação'
+            )}
           </button>
 
         </div>
