@@ -53,6 +53,7 @@ export default function ReviewPage() {
   const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [replyingTo, setReplyingTo] = useState(null)
   const [showEditModal, setShowEditModal] = useState(false)
 
   const fetchAll = useCallback(async () => {
@@ -143,20 +144,33 @@ export default function ReviewPage() {
     setSubmitting(true)
 
     if (editing) {
-      await supabase
+      const { error } = await supabase
         .from('comments')
-        .update({ content: comment })
+        .update({
+          content: comment.trim()
+        })
         .eq('id', editing)
+
+      if (error) {
+        console.error('Erro ao editar comentário:', error)
+      }
 
       setEditing(null)
     } else {
-      await supabase
+      const { error } = await supabase
         .from('comments')
         .insert({
           review_id: id,
           user_id: user.id,
-          content: comment
+          content: comment.trim(),
+          parent_id: replyingTo || null
         })
+
+      if (error) {
+        console.error('Erro ao enviar comentário:', error)
+      }
+
+      setReplyingTo(null)
     }
 
     setComment('')
@@ -210,6 +224,23 @@ export default function ReviewPage() {
     fetchAll()
   }
 
+  const startReply = (commentId) => {
+    setReplyingTo(commentId)
+    setEditing(null)
+    setComment('')
+  }
+
+  const cancelReply = () => {
+    setReplyingTo(null)
+    setComment('')
+  }
+
+  const startEditing = (commentId, content) => {
+    setEditing(commentId)
+    setReplyingTo(null)
+    setComment(content)
+  }
+
   if (loading) {
     return (
       <div className={styles.center}>
@@ -235,17 +266,6 @@ export default function ReviewPage() {
 
   const isOwner = user?.id === review.user_id
 
-  /*
-   * Cada usuário deve aparecer apenas uma vez
-   * nos avatares, mesmo que tenha várias reações.
-   *
-   * Exemplo:
-   * João -> Curtir
-   * João -> Incrível
-   * João -> Concordo
-   *
-   * Continua sendo apenas 1 pessoa visualmente.
-   */
   const uniqueReactionPeople = Array.from(
     new Map(
       reactions
@@ -254,17 +274,26 @@ export default function ReviewPage() {
     ).values()
   )
 
-  // Até 5 usuários diferentes aparecem visualmente
   const visibleReactionPeople = uniqueReactionPeople.slice(0, 5)
 
-  // Quantidade de usuários além dos 5 avatares exibidos
   const extraReactionCount = Math.max(
     uniqueReactionPeople.length - visibleReactionPeople.length,
     0
   )
 
-  // Quantidade real de pessoas que reagiram
   const uniqueReactionCount = uniqueReactionPeople.length
+
+  // Comentários principais
+  const mainComments = comments.filter(
+    c => !c.parent_id
+  )
+
+  // Respostas agrupadas por comentário
+  const getReplies = (commentId) => {
+    return comments.filter(
+      c => c.parent_id === commentId
+    )
+  }
 
   return (
     <div className={styles.page}>
@@ -280,6 +309,7 @@ export default function ReviewPage() {
       <article className={styles.reviewCard}>
 
         <div className={styles.reviewTop}>
+
           <div className={styles.tags}>
             <span className={styles.genre}>
               {review.genre}
@@ -292,6 +322,7 @@ export default function ReviewPage() {
 
           {isOwner && (
             <div className={styles.ownerActions}>
+
               <button
                 onClick={() => setShowEditModal(true)}
                 className={styles.iconBtn}
@@ -307,11 +338,14 @@ export default function ReviewPage() {
               >
                 <TrashIcon size={16} />
               </button>
+
             </div>
           )}
+
         </div>
 
         <div className={styles.ratingRow}>
+
           {review.game_image && (
             <img
               src={review.game_image}
@@ -328,16 +362,27 @@ export default function ReviewPage() {
           </div>
 
           <div>
+
             <h1 className={styles.gameName}>
               {review.game_name}
             </h1>
 
             <Stars rating={review.rating} />
 
-            <div className={review.platinado ? styles.platinado : styles.naoPlatinado}>
-              {review.platinado ? 'PLATINADO' : 'NÃO PLATINADO'}
+            <div
+              className={
+                review.platinado
+                  ? styles.platinado
+                  : styles.naoPlatinado
+              }
+            >
+              {review.platinado
+                ? 'PLATINADO'
+                : 'NÃO PLATINADO'}
             </div>
+
           </div>
+
         </div>
 
         <p className={styles.comment}>
@@ -350,7 +395,9 @@ export default function ReviewPage() {
             to={`/profile/${review.profile_id}`}
             className={styles.author}
           >
+
             <div className={styles.avatar}>
+
               {review.avatar_url ? (
                 <img
                   src={review.avatar_url}
@@ -361,15 +408,19 @@ export default function ReviewPage() {
                   {(review.username || '?')[0].toUpperCase()}
                 </span>
               )}
+
             </div>
 
             <div>
+
               <span className={styles.authorName}>
                 {review.username}
               </span>
 
               <span className={styles.date}>
-                {new Date(review.created_at).toLocaleDateString(
+                {new Date(
+                  review.created_at
+                ).toLocaleDateString(
                   'pt-BR',
                   {
                     day: '2-digit',
@@ -378,54 +429,68 @@ export default function ReviewPage() {
                   }
                 )}
               </span>
+
             </div>
+
           </Link>
 
           <div className={styles.reactionBar}>
-            {REACTION_TYPES.map(({ type, Icon, label }) => {
-              const count = reactions.filter(
-                r => r.type === type
-              ).length
 
-              const active = reactions.some(
-                r =>
-                  r.user_id === user.id &&
-                  r.type === type
-              )
+            {REACTION_TYPES.map(
+              ({ type, Icon, label }) => {
 
-              return (
-                <button
-                  key={type}
-                  className={`${styles.reactionBtn} ${active ? styles.active : ''}`}
-                  onClick={() => handleReaction(type)}
-                  title={label}
-                >
-                  <Icon size={16} />
+                const count = reactions.filter(
+                  r => r.type === type
+                ).length
 
-                  <span>{label}</span>
+                const active = reactions.some(
+                  r =>
+                    r.user_id === user.id &&
+                    r.type === type
+                )
 
-                  {count > 0 && (
-                    <strong>{count}</strong>
-                  )}
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={type}
+                    className={`${styles.reactionBtn} ${
+                      active ? styles.active : ''
+                    }`}
+                    onClick={() => handleReaction(type)}
+                    title={label}
+                  >
+
+                    <Icon size={16} />
+
+                    <span>{label}</span>
+
+                    {count > 0 && (
+                      <strong>{count}</strong>
+                    )}
+
+                  </button>
+                )
+              }
+            )}
+
           </div>
 
         </div>
 
-        {/* PESSOAS QUE REAGIRAM */}
         {visibleReactionPeople.length > 0 && (
+
           <div className={styles.reactionPeople}>
 
             <div className={styles.reactionAvatars}>
+
               {visibleReactionPeople.map(profile => (
+
                 <Link
                   key={profile.id}
                   to={`/profile/${profile.id}`}
                   className={styles.reactionPerson}
                   title={profile.username}
                 >
+
                   {profile.avatar_url ? (
                     <img
                       src={profile.avatar_url}
@@ -436,7 +501,9 @@ export default function ReviewPage() {
                       {(profile.username || '?')[0].toUpperCase()}
                     </span>
                   )}
+
                 </Link>
+
               ))}
 
               {extraReactionCount > 0 && (
@@ -444,6 +511,7 @@ export default function ReviewPage() {
                   +{extraReactionCount}
                 </div>
               )}
+
             </div>
 
             <span className={styles.reactionPeopleText}>
@@ -453,6 +521,7 @@ export default function ReviewPage() {
             </span>
 
           </div>
+
         )}
 
       </article>
@@ -460,29 +529,40 @@ export default function ReviewPage() {
       <section className={styles.commentsSection}>
 
         <h3 className={styles.commentsTitle}>
+
           <MessageIcon size={18} />
 
           {comments.length}{' '}
+
           {comments.length === 1
             ? 'comentário'
             : 'comentários'}
+
         </h3>
 
         <div className={styles.commentInput}>
 
-          <textarea
-            placeholder="Escreva um comentário..."
-            value={comment}
-            onChange={e => setComment(e.target.value)}
-            rows={3}
-            className={styles.textarea}
-          />
+          {replyingTo && (
+            <div className={styles.replyingTo}>
 
-          <div className={styles.commentActions}>
+              Respondendo a @{comments.find(
+                c => c.id === replyingTo
+              )?.username}
 
-            {editing && (
               <button
-                className={styles.cancelBtn}
+                onClick={cancelReply}
+              >
+                Cancelar
+              </button>
+
+            </div>
+          )}
+
+          {editing && (
+            <div className={styles.editingComment}>
+              Editando comentário
+
+              <button
                 onClick={() => {
                   setEditing(null)
                   setComment('')
@@ -490,7 +570,26 @@ export default function ReviewPage() {
               >
                 Cancelar
               </button>
-            )}
+            </div>
+          )}
+
+          <textarea
+            placeholder={
+              replyingTo
+                ? 'Escreva sua resposta...'
+                : editing
+                  ? 'Edite seu comentário...'
+                  : 'Escreva um comentário...'
+            }
+            value={comment}
+            onChange={e =>
+              setComment(e.target.value)
+            }
+            rows={3}
+            className={styles.textarea}
+          />
+
+          <div className={styles.commentActions}>
 
             <button
               className={styles.submitBtn}
@@ -500,91 +599,223 @@ export default function ReviewPage() {
                 !comment.trim()
               }
             >
+
               {submitting ? (
                 <SpinnerIcon size={16} />
               ) : editing ? (
                 'Salvar'
+              ) : replyingTo ? (
+                'Responder'
               ) : (
                 'Comentar'
               )}
+
             </button>
 
           </div>
+
         </div>
 
         <div className={styles.commentList}>
 
-          {comments.map(c => (
-            <div
-              key={c.id}
-              className={styles.commentItem}
-            >
+          {mainComments.map(c => {
 
-              <Link
-                to={`/profile/${c.profile_id}`}
-                className={styles.commentAvatar}
+            const replies = getReplies(c.id)
+
+            return (
+              <div
+                key={c.id}
+                className={styles.commentGroup}
               >
-                {c.avatar_url ? (
-                  <img
-                    src={c.avatar_url}
-                    alt=""
-                  />
-                ) : (
-                  <span>
-                    {(c.username || '?')[0].toUpperCase()}
-                  </span>
-                )}
-              </Link>
 
-              <div className={styles.commentBody}>
+                {/* COMENTÁRIO PRINCIPAL */}
 
-                <div className={styles.commentHead}>
+                <div className={styles.commentItem}>
 
                   <Link
                     to={`/profile/${c.profile_id}`}
-                    className={styles.commentUser}
+                    className={styles.commentAvatar}
                   >
-                    {c.username}
+
+                    {c.avatar_url ? (
+                      <img
+                        src={c.avatar_url}
+                        alt=""
+                      />
+                    ) : (
+                      <span>
+                        {(c.username || '?')[0].toUpperCase()}
+                      </span>
+                    )}
+
                   </Link>
 
-                  <span className={styles.commentDate}>
-                    {new Date(c.created_at).toLocaleDateString(
-                      'pt-BR'
-                    )}
-                  </span>
+                  <div className={styles.commentBody}>
 
-                  {user?.id === c.user_id && (
-                    <div className={styles.commentOwner}>
+                    <div className={styles.commentHead}>
 
-                      <button
-                        onClick={() => {
-                          setEditing(c.id)
-                          setComment(c.content)
-                        }}
-                        className={styles.iconBtn}
+                      <Link
+                        to={`/profile/${c.profile_id}`}
+                        className={styles.commentUser}
                       >
-                        <EditIcon size={13} />
-                      </button>
+                        {c.username}
+                      </Link>
 
-                      <button
-                        onClick={() => deleteComment(c.id)}
-                        className={`${styles.iconBtn} ${styles.danger}`}
-                      >
-                        <TrashIcon size={13} />
-                      </button>
+                      <span className={styles.commentDate}>
+                        {new Date(
+                          c.created_at
+                        ).toLocaleDateString('pt-BR')}
+                      </span>
+
+                      {user?.id === c.user_id && (
+
+                        <div className={styles.commentOwner}>
+
+                          <button
+                            onClick={() =>
+                              startEditing(
+                                c.id,
+                                c.content
+                              )
+                            }
+                            className={styles.iconBtn}
+                          >
+                            <EditIcon size={13} />
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              deleteComment(c.id)
+                            }
+                            className={`${styles.iconBtn} ${styles.danger}`}
+                          >
+                            <TrashIcon size={13} />
+                          </button>
+
+                        </div>
+
+                      )}
 
                     </div>
-                  )}
+
+                    <p className={styles.commentText}>
+                      {c.content}
+                    </p>
+
+                    <button
+                      className={styles.replyBtn}
+                      onClick={() =>
+                        startReply(c.id)
+                      }
+                    >
+                      Responder
+                    </button>
+
+                  </div>
 
                 </div>
 
-                <p className={styles.commentText}>
-                  {c.content}
-                </p>
+                {/* RESPOSTAS */}
+
+                {replies.length > 0 && (
+
+                  <div className={styles.replies}>
+
+                    {replies.map(reply => (
+
+                      <div
+                        key={reply.id}
+                        className={styles.commentItem}
+                      >
+
+                        <Link
+                          to={`/profile/${reply.profile_id}`}
+                          className={styles.commentAvatar}
+                        >
+
+                          {reply.avatar_url ? (
+                            <img
+                              src={reply.avatar_url}
+                              alt=""
+                            />
+                          ) : (
+                            <span>
+                              {(reply.username || '?')[0].toUpperCase()}
+                            </span>
+                          )}
+
+                        </Link>
+
+                        <div className={styles.commentBody}>
+
+                          <div className={styles.commentHead}>
+
+                            <Link
+                              to={`/profile/${reply.profile_id}`}
+                              className={styles.commentUser}
+                            >
+                              {reply.username}
+                            </Link>
+
+                            <span className={styles.commentDate}>
+                              {new Date(
+                                reply.created_at
+                              ).toLocaleDateString(
+                                'pt-BR'
+                              )}
+                            </span>
+
+                            {user?.id === reply.user_id && (
+
+                              <div className={styles.commentOwner}>
+
+                                <button
+                                  onClick={() =>
+                                    startEditing(
+                                      reply.id,
+                                      reply.content
+                                    )
+                                  }
+                                  className={styles.iconBtn}
+                                >
+                                  <EditIcon size={13} />
+                                </button>
+
+                                <button
+                                  onClick={() =>
+                                    deleteComment(
+                                      reply.id
+                                    )
+                                  }
+                                  className={`${styles.iconBtn} ${styles.danger}`}
+                                >
+                                  <TrashIcon size={13} />
+                                </button>
+
+                              </div>
+
+                            )}
+
+                          </div>
+
+                          <p className={styles.commentText}>
+                            {reply.content}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    ))}
+
+                  </div>
+
+                )}
 
               </div>
-            </div>
-          ))}
+            )
+
+          })}
 
         </div>
 
@@ -606,4 +837,3 @@ export default function ReviewPage() {
     </div>
   )
 }
-

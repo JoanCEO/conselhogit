@@ -265,5 +265,69 @@
   color: var(--black);
   background: var(--white);
 }
+.replyBtn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 5px 10px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--grey-500);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.replyBtn:hover {
+  color: var(--black);
+  border-color: var(--black);
+  background: var(--grey-100);
+}
+
+.replies {
+  margin-left: 44px;
+  margin-top: 14px;
+  padding-left: 16px;
+  border-left: 2px solid var(--grey-200);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.replyingTo,
+.editingComment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--grey-100);
+  background: var(--grey-100);
+  color: var(--grey-600);
+  font-size: 12px;
+}
+
+.replyingTo button,
+.editingComment button {
+  border: none;
+  background: transparent;
+  color: var(--grey-500);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.replyingTo button:hover,
+.editingComment button:hover {
+  color: var(--black);
+}
+
+@media (max-width: 600px) {
+  .replies {
+    margin-left: 20px;
+    padding-left: 12px;
+  }
+}
 
 

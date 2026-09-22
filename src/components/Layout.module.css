@@ -312,3 +312,273 @@
     padding: 24px 16px;
   }
 }
+
+/* =========================================
+   NOTIFICAÇÕES
+   ========================================= */
+
+.notificationWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notificationBtn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--black);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.notificationBtn:hover {
+  background: var(--grey-100);
+  border-color: var(--grey-200);
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.notificationPanel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 30px);
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.notificationHeader {
+  min-height: 52px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.notificationHeader strong {
+  font-size: 14px;
+  color: var(--black);
+}
+
+.markAllBtn {
+  border: none;
+  background: transparent;
+  color: var(--grey-500);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.markAllBtn:hover {
+  color: var(--black);
+}
+
+.notificationList {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.notificationItem {
+  width: 100%;
+  padding: 13px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: none;
+  border-bottom: 1px solid var(--grey-100);
+  background: var(--white);
+  color: var(--black);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+.notificationItem:hover {
+  background: var(--grey-100);
+}
+
+/* =========================================
+   NÃO LIDA
+   ========================================= */
+
+.notificationUnread {
+  background: var(--white);
+}
+
+.notificationUnread:hover {
+  background: var(--grey-100);
+}
+
+.notificationUnread .notificationContent strong {
+  font-weight: 800;
+}
+
+.notificationDot {
+  width: 8px;
+  min-width: 8px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationDot span {
+  width: 7px;
+  height: 7px;
+  display: block;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #000;
+}
+
+.notificationContent {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notificationContent strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.notificationContent span {
+  color: var(--grey-500);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.notificationContent small {
+  color: var(--grey-400);
+  font-size: 10px;
+}
+
+.emptyNotifications {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--grey-400);
+  font-size: 12px;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .headerInner {
+    padding: 10px 14px;
+  }
+
+  .logoWrap {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .logo {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .version {
+    font-size: 8px;
+  }
+
+  .headerRight {
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .addBtn {
+    display: none;
+  }
+
+  .avatarWrap {
+    order: 1;
+    flex-shrink: 0;
+  }
+
+  .notificationWrap {
+    order: 2;
+    flex-shrink: 0;
+  }
+
+  .mobileMenuBtn {
+    order: 3;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .notificationBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .notificationBadge {
+    top: -2px;
+    right: -2px;
+  }
+
+  .notificationPanel {
+    position: fixed;
+    top: 68px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+  }
+
+}
