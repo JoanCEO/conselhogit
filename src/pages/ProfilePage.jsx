@@ -35,7 +35,8 @@ export default function ProfilePage() {
     username: '',
     full_name: '',
     bio: '',
-    avatar_url: ''
+    avatar_url: '',
+    banner_url: ''
   })
 
   const [saving, setSaving] = useState(false)
@@ -46,11 +47,19 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       setLoading(true)
 
-      const { data: p } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const { data: p, error: profileError } =
+        await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', id)
+          .single()
+
+      if (profileError) {
+        console.error(
+          'Erro ao buscar perfil:',
+          profileError
+        )
+      }
 
       setProfile(p)
 
@@ -59,21 +68,34 @@ export default function ProfilePage() {
           username: p.username || '',
           full_name: p.full_name || '',
           bio: p.bio || '',
-          avatar_url: p.avatar_url || ''
+          avatar_url: p.avatar_url || '',
+          banner_url: p.banner_url || ''
         })
       }
 
-      const { data: rv } = await supabase
-        .from('reviews')
-        .select('*, profiles:user_id(username, full_name, avatar_url)')
-        .eq('user_id', id)
-        .order('created_at', { ascending: false })
+      const { data: rv, error: reviewsError } =
+        await supabase
+          .from('reviews')
+          .select(
+            '*, profiles:user_id(username, full_name, avatar_url)'
+          )
+          .eq('user_id', id)
+          .order('created_at', {
+            ascending: false
+          })
+
+      if (reviewsError) {
+        console.error(
+          'Erro ao buscar avaliações:',
+          reviewsError
+        )
+      }
 
       const mapped = (rv || []).map(r => ({
         ...r,
         username: r.profiles?.username,
         avatar_url: r.profiles?.avatar_url,
-        comment_count: 0,
+        comment_count: 0
       }))
 
       setReviews(mapped)
@@ -81,17 +103,24 @@ export default function ProfilePage() {
       const ids = (rv || []).map(r => r.id)
 
       if (ids.length) {
-        const { data: rcts } = await supabase
-          .from('reactions')
-          .select('*')
-          .in('review_id', ids)
+        const { data: rcts, error: reactionsError } =
+          await supabase
+            .from('reactions')
+            .select('*')
+            .in('review_id', ids)
+
+        if (reactionsError) {
+          console.error(
+            'Erro ao buscar reações:',
+            reactionsError
+          )
+        }
 
         setReactions(rcts || [])
       } else {
         setReactions([])
       }
 
-      // Buscar seguidores
       const { count: followers } = await supabase
         .from('seguidores')
         .select('*', {
@@ -102,7 +131,6 @@ export default function ProfilePage() {
 
       setFollowersCount(followers || 0)
 
-      // Buscar quem o usuário segue
       const { count: following } = await supabase
         .from('seguidores')
         .select('*', {
@@ -113,7 +141,6 @@ export default function ProfilePage() {
 
       setFollowingCount(following || 0)
 
-      // Verificar se o usuário atual segue este perfil
       if (user && !isMe) {
         const { data: follow } = await supabase
           .from('seguidores')
@@ -133,7 +160,7 @@ export default function ProfilePage() {
     fetchProfile()
   }, [id, user?.id])
 
-  const openUserList = async (type) => {
+  const openUserList = async type => {
     setUserListType(type)
     setLoadingUserList(true)
     setUserList([])
@@ -158,6 +185,7 @@ export default function ProfilePage() {
         'Erro ao buscar relacionamentos:',
         error
       )
+
       setLoadingUserList(false)
       return
     }
@@ -172,13 +200,15 @@ export default function ProfilePage() {
       return
     }
 
-    const { data: profiles, error: profilesError } =
-      await supabase
-        .from('profiles')
-        .select(
-          'id, username, full_name, avatar_url'
-        )
-        .in('id', userIds)
+    const {
+      data: profiles,
+      error: profilesError
+    } = await supabase
+      .from('profiles')
+      .select(
+        'id, username, full_name, avatar_url'
+      )
+      .in('id', userIds)
 
     if (profilesError) {
       console.error(
@@ -208,8 +238,14 @@ export default function ProfilePage() {
 
       if (!error) {
         setIsFollowing(false)
+
         setFollowersCount(prev =>
           Math.max(0, prev - 1)
+        )
+      } else {
+        console.error(
+          'Erro ao deixar de seguir:',
+          error
         )
       }
     } else {
@@ -223,20 +259,71 @@ export default function ProfilePage() {
       if (!error) {
         setIsFollowing(true)
         setFollowersCount(prev => prev + 1)
+      } else {
+        console.error(
+          'Erro ao seguir usuário:',
+          error
+        )
       }
     }
 
     setFollowLoading(false)
   }
 
+  const handleEditStart = () => {
+    setForm({
+      username: profile.username || '',
+      full_name: profile.full_name || '',
+      bio: profile.bio || '',
+      avatar_url: profile.avatar_url || '',
+      banner_url: profile.banner_url || ''
+    })
+
+    setEditing(true)
+  }
+
+  const handleCancelEdit = () => {
+    setForm({
+      username: profile.username || '',
+      full_name: profile.full_name || '',
+      bio: profile.bio || '',
+      avatar_url: profile.avatar_url || '',
+      banner_url: profile.banner_url || ''
+    })
+
+    setEditing(false)
+  }
+
   const handleSave = async () => {
     setSaving(true)
 
-    const { data, error } = await updateProfile(form)
+    const cleanForm = {
+      username: form.username.trim(),
+      full_name: form.full_name.trim(),
+      bio: form.bio.trim(),
+      avatar_url: form.avatar_url.trim(),
+      banner_url: form.banner_url.trim()
+    }
+
+    const { data, error } =
+      await updateProfile(cleanForm)
 
     if (!error) {
       setProfile(data)
+      setForm({
+        username: data?.username || '',
+        full_name: data?.full_name || '',
+        bio: data?.bio || '',
+        avatar_url: data?.avatar_url || '',
+        banner_url: data?.banner_url || ''
+      })
+
       setEditing(false)
+    } else {
+      console.error(
+        'Erro ao atualizar perfil:',
+        error
+      )
     }
 
     setSaving(false)
@@ -260,13 +347,17 @@ export default function ProfilePage() {
 
   const avgRating = reviews.length
     ? (
-        reviews.reduce((s, r) => s + r.rating, 0) /
-        reviews.length
+        reviews.reduce(
+          (s, r) => s + r.rating,
+          0
+        ) / reviews.length
       ).toFixed(1)
     : null
 
   const memberSince = profile.created_at
-    ? new Date(profile.created_at).toLocaleDateString(
+    ? new Date(
+        profile.created_at
+      ).toLocaleDateString(
         'pt-BR',
         {
           day: '2-digit',
@@ -289,226 +380,646 @@ export default function ProfilePage() {
 
       <div className={styles.profileCard}>
 
-        <div className={styles.avatarBig}>
-          {profile.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt=""
+        {/* BANNER */}
+
+        <div
+          className={styles.profileBanner}
+          style={
+            profile.banner_url
+              ? {
+                  backgroundImage: `url("${profile.banner_url}")`
+                }
+              : undefined
+          }
+        >
+          {!profile.banner_url && (
+            <div
+              className={
+                styles.bannerPlaceholder
+              }
             />
-          ) : (
-            <span>
-              {(profile.username || '?')[0].toUpperCase()}
-            </span>
           )}
         </div>
 
-        {!editing ? (
-          <div className={styles.profileInfo}>
+        {/* CONTEÚDO */}
 
-            <div className={styles.nameRow}>
+        <div className={styles.profileContent}>
 
-              <h1 className={styles.displayName}>
-                {profile.full_name || profile.username}
-              </h1>
+          {/* AVATAR */}
 
-              {isMe ? (
-                <button
-                  className={styles.editBtn}
-                  onClick={() => setEditing(true)}
-                >
-                  <EditIcon size={16} />
-                  Editar perfil
-                </button>
-              ) : (
-                <button
-                  className={`${styles.followBtn} ${
-                    isFollowing
-                      ? styles.followingBtn
-                      : ''
-                  }`}
-                  onClick={handleFollow}
-                  disabled={followLoading}
-                >
-                  {followLoading ? (
-                    <SpinnerIcon size={15} />
-                  ) : (
-                    isFollowing
-                      ? 'Seguindo'
-                      : 'Seguir'
-                  )}
-                </button>
+          <div className={styles.avatarBig}>
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt=""
+              />
+            ) : (
+              <span>
+                {(
+                  profile.username || '?'
+                )[0].toUpperCase()}
+              </span>
+            )}
+          </div>
+
+          {!editing ? (
+
+            /* =========================
+               PERFIL NORMAL
+            ========================= */
+
+            <div className={styles.profileInfo}>
+
+              <div className={styles.nameRow}>
+
+                <div className={styles.nameBlock}>
+
+                  <h1
+                    className={
+                      styles.displayName
+                    }
+                  >
+                    {profile.full_name ||
+                      profile.username}
+                  </h1>
+
+                  <p
+                    className={
+                      styles.username
+                    }
+                  >
+                    @{profile.username}
+                  </p>
+
+                </div>
+
+                {isMe ? (
+                  <button
+                    className={
+                      styles.editBtn
+                    }
+                    onClick={
+                      handleEditStart
+                    }
+                  >
+                    <EditIcon size={16} />
+                    Editar perfil
+                  </button>
+                ) : (
+                  <button
+                    className={`${styles.followBtn} ${
+                      isFollowing
+                        ? styles.followingBtn
+                        : ''
+                    }`}
+                    onClick={
+                      handleFollow
+                    }
+                    disabled={
+                      followLoading
+                    }
+                  >
+                    {followLoading ? (
+                      <SpinnerIcon size={15} />
+                    ) : (
+                      isFollowing
+                        ? 'Seguindo'
+                        : 'Seguir'
+                    )}
+                  </button>
+                )}
+
+              </div>
+
+              {profile.bio && (
+                <p className={styles.bio}>
+                  {profile.bio}
+                </p>
               )}
+
+              {memberSince && (
+                <p
+                  className={
+                    styles.memberSince
+                  }
+                >
+                  Membro desde {memberSince}
+                </p>
+              )}
+
+              <div className={styles.stats}>
+
+                <div className={styles.stat}>
+
+                  <span
+                    className={
+                      styles.statNum
+                    }
+                  >
+                    {reviews.length}
+                  </span>
+
+                  <span
+                    className={
+                      styles.statLabel
+                    }
+                  >
+                    avaliações
+                  </span>
+
+                </div>
+
+                <button
+                  className={
+                    styles.statButton
+                  }
+                  onClick={() =>
+                    openUserList(
+                      'followers'
+                    )
+                  }
+                >
+                  <span
+                    className={
+                      styles.statNum
+                    }
+                  >
+                    {followersCount}
+                  </span>
+
+                  <span
+                    className={
+                      styles.statLabel
+                    }
+                  >
+                    seguidores
+                  </span>
+                </button>
+
+                <button
+                  className={
+                    styles.statButton
+                  }
+                  onClick={() =>
+                    openUserList(
+                      'following'
+                    )
+                  }
+                >
+                  <span
+                    className={
+                      styles.statNum
+                    }
+                  >
+                    {followingCount}
+                  </span>
+
+                  <span
+                    className={
+                      styles.statLabel
+                    }
+                  >
+                    seguindo
+                  </span>
+                </button>
+
+                {avgRating && (
+                  <div
+                    className={
+                      styles.stat
+                    }
+                  >
+                    <span
+                      className={
+                        styles.statNum
+                      }
+                    >
+                      {avgRating}
+                    </span>
+
+                    <span
+                      className={
+                        styles.statLabel
+                      }
+                    >
+                      média
+                    </span>
+                  </div>
+                )}
+
+              </div>
 
             </div>
 
-            <p className={styles.username}>
-              @{profile.username}
-            </p>
+          ) : (
 
-            {memberSince && (
-              <p className={styles.memberSince}>
-                Membro desde {memberSince}
-              </p>
-            )}
+            /* =========================
+               EDITAR PERFIL
+            ========================= */
 
-            {profile.bio && (
-              <p className={styles.bio}>
-                {profile.bio}
-              </p>
-            )}
+            <div className={styles.editForm}>
 
-            <div className={styles.stats}>
+              <div
+                className={
+                  styles.editHeader
+                }
+              >
+                <div>
 
-              <div className={styles.stat}>
-                <span className={styles.statNum}>
-                  {reviews.length}
-                </span>
+                  <h2
+                    className={
+                      styles.editTitle
+                    }
+                  >
+                    Editar perfil
+                  </h2>
 
-                <span className={styles.statLabel}>
-                  avaliações
-                </span>
+                  <p
+                    className={
+                      styles.editSubtitle
+                    }
+                  >
+                    Personalize as informações
+                    que aparecem no seu perfil.
+                  </p>
+
+                </div>
               </div>
 
-              <button
-                className={styles.statButton}
-                onClick={() =>
-                  openUserList('followers')
+              {/* PERFIL */}
+
+              <div
+                className={
+                  styles.editSection
                 }
               >
-                <span className={styles.statNum}>
-                  {followersCount}
-                </span>
 
-                <span className={styles.statLabel}>
-                  seguidores
-                </span>
-              </button>
+                <div
+                  className={
+                    styles.editSectionHeader
+                  }
+                >
+                  <h3>Perfil</h3>
 
-              <button
-                className={styles.statButton}
-                onClick={() =>
-                  openUserList('following')
-                }
-              >
-                <span className={styles.statNum}>
-                  {followingCount}
-                </span>
-
-                <span className={styles.statLabel}>
-                  seguindo
-                </span>
-              </button>
-
-              {avgRating && (
-                <div className={styles.stat}>
-                  <span className={styles.statNum}>
-                    {avgRating}
-                  </span>
-
-                  <span className={styles.statLabel}>
-                    média
+                  <span>
+                    Informações básicas da
+                    sua conta
                   </span>
                 </div>
-              )}
 
-            </div>
+                <div
+                  className={
+                    styles.editFields
+                  }
+                >
 
-          </div>
-        ) : (
+                  <div
+                    className={
+                      styles.field
+                    }
+                  >
 
-          <div className={styles.editForm}>
+                    <label>
+                      Nome completo
+                    </label>
 
-            <input
-              placeholder="Nome completo"
-              value={form.full_name}
-              onChange={e =>
-                setForm(f => ({
-                  ...f,
-                  full_name: e.target.value
-                }))
-              }
-              className={styles.input}
-            />
+                    <input
+                      placeholder="Seu nome"
+                      value={
+                        form.full_name
+                      }
+                      onChange={e =>
+                        setForm(f => ({
+                          ...f,
+                          full_name:
+                            e.target.value
+                        }))
+                      }
+                      className={
+                        styles.input
+                      }
+                    />
 
-            <input
-              placeholder="Username"
-              value={form.username}
-              onChange={e =>
-                setForm(f => ({
-                  ...f,
-                  username: e.target.value
-                }))
-              }
-              className={styles.input}
-            />
+                  </div>
 
-            <input
-              placeholder="URL da foto ou GIF"
-              value={form.avatar_url}
-              onChange={e =>
-                setForm(f => ({
-                  ...f,
-                  avatar_url: e.target.value
-                }))
-              }
-              className={styles.input}
-            />
+                  <div
+                    className={
+                      styles.field
+                    }
+                  >
 
-            {form.avatar_url && (
-              <div className={styles.avatarPreview}>
-                <img
-                  src={form.avatar_url}
-                  alt="Prévia do avatar"
-                />
+                    <label>
+                      Nome de usuário
+                    </label>
+
+                    <input
+                      placeholder="username"
+                      value={
+                        form.username
+                      }
+                      onChange={e =>
+                        setForm(f => ({
+                          ...f,
+                          username:
+                            e.target.value
+                        }))
+                      }
+                      className={
+                        styles.input
+                      }
+                    />
+
+                    <span
+                      className={
+                        styles.fieldHint
+                      }
+                    >
+                      Esse nome será exibido
+                      como @
+                      {form.username ||
+                        'username'}
+                    </span>
+
+                  </div>
+
+                </div>
+
               </div>
-            )}
 
-            <textarea
-              placeholder="Bio"
-              value={form.bio}
-              onChange={e =>
-                setForm(f => ({
-                  ...f,
-                  bio: e.target.value
-                }))
-              }
-              className={styles.textarea}
-              rows={3}
-            />
+              {/* IMAGENS */}
 
-            <div className={styles.editActions}>
-
-              <button
-                onClick={() => setEditing(false)}
-                className={styles.cancelBtn}
+              <div
+                className={
+                  styles.editSection
+                }
               >
-                Cancelar
-              </button>
 
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className={styles.saveBtn}
+                <div
+                  className={
+                    styles.editSectionHeader
+                  }
+                >
+                  <h3>Imagens</h3>
+
+                  <span>
+                    Personalize seu avatar
+                    e banner
+                  </span>
+                </div>
+
+                <div
+                  className={
+                    styles.imageEditGrid
+                  }
+                >
+
+                  {/* AVATAR */}
+
+                  <div
+                    className={
+                      styles.imageEditCard
+                    }
+                  >
+
+                    <div
+                      className={
+                        styles.imageEditTitle
+                      }
+                    >
+                      <strong>
+                        Avatar
+                      </strong>
+
+                      <span>
+                        Foto do perfil
+                      </span>
+                    </div>
+
+                    <div
+                      className={
+                        styles.avatarEditPreview
+                      }
+                    >
+                      {form.avatar_url ? (
+                        <img
+                          src={
+                            form.avatar_url
+                          }
+                          alt="Prévia do avatar"
+                        />
+                      ) : (
+                        <span>
+                          {(
+                            form.username ||
+                            '?'
+                          )[0].toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    <input
+                      placeholder="URL da foto ou GIF"
+                      value={
+                        form.avatar_url
+                      }
+                      onChange={e =>
+                        setForm(f => ({
+                          ...f,
+                          avatar_url:
+                            e.target.value
+                        }))
+                      }
+                      className={
+                        styles.input
+                      }
+                    />
+
+                  </div>
+
+                  {/* BANNER */}
+
+                  <div
+                    className={
+                      styles.imageEditCard
+                    }
+                  >
+
+                    <div
+                      className={
+                        styles.imageEditTitle
+                      }
+                    >
+                      <strong>
+                        Banner
+                      </strong>
+
+                      <span>
+                        Imagem exibida no
+                        topo do perfil
+                      </span>
+                    </div>
+
+                    <div
+                      className={
+                        styles.bannerEditPreview
+                      }
+                    >
+                      {form.banner_url ? (
+                        <img
+                          src={
+                            form.banner_url
+                          }
+                          alt="Prévia do banner"
+                        />
+                      ) : (
+                        <div
+                          className={
+                            styles.bannerEditPlaceholder
+                          }
+                        >
+                          Sem banner
+                        </div>
+                      )}
+                    </div>
+
+                    <input
+                      placeholder="URL do banner"
+                      value={
+                        form.banner_url
+                      }
+                      onChange={e =>
+                        setForm(f => ({
+                          ...f,
+                          banner_url:
+                            e.target.value
+                        }))
+                      }
+                      className={
+                        styles.input
+                      }
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* BIO */}
+
+              <div
+                className={
+                  styles.editSection
+                }
               >
-                {saving ? (
-                  <SpinnerIcon size={16} />
-                ) : (
-                  'Salvar'
-                )}
-              </button>
+
+                <div
+                  className={
+                    styles.editSectionHeader
+                  }
+                >
+                  <h3>
+                    Sobre você
+                  </h3>
+
+                  <span>
+                    Conte um pouco sobre
+                    você
+                  </span>
+                </div>
+
+                <div
+                  className={
+                    styles.field
+                  }
+                >
+
+                  <label>Bio</label>
+
+                  <textarea
+                    placeholder="Escreva algo sobre você..."
+                    value={form.bio}
+                    onChange={e =>
+                      setForm(f => ({
+                        ...f,
+                        bio: e.target.value
+                      }))
+                    }
+                    className={
+                      styles.textarea
+                    }
+                    rows={4}
+                  />
+
+                  <span
+                    className={
+                      styles.fieldHint
+                    }
+                  >
+                    Sua bio aparecerá abaixo
+                    do seu nome no perfil.
+                  </span>
+
+                </div>
+
+              </div>
+
+              {/* AÇÕES */}
+
+              <div
+                className={
+                  styles.editActions
+                }
+              >
+
+                <button
+                  onClick={
+                    handleCancelEdit
+                  }
+                  className={
+                    styles.cancelBtn
+                  }
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className={
+                    styles.saveBtn
+                  }
+                >
+                  {saving ? (
+                    <SpinnerIcon size={16} />
+                  ) : (
+                    'Salvar alterações'
+                  )}
+                </button>
+
+              </div>
 
             </div>
+          )}
 
-          </div>
-
-        )}
+        </div>
 
       </div>
 
-      {reviews.length > 0 && (
-        <div className={styles.reviewsSection}>
+      {/* AVALIAÇÕES */}
 
-          <h2 className={styles.sectionTitle}>
+      {reviews.length > 0 && (
+        <div
+          className={
+            styles.reviewsSection
+          }
+        >
+
+          <h2
+            className={
+              styles.sectionTitle
+            }
+          >
             Avaliações
           </h2>
 
@@ -519,7 +1030,8 @@ export default function ProfilePage() {
                 key={r.id}
                 review={r}
                 reactions={reactions.filter(
-                  rx => rx.review_id === r.id
+                  rx =>
+                    rx.review_id === r.id
                 )}
               />
             ))}
@@ -529,27 +1041,46 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {reviews.length === 0 && !loading && (
-        <p className={styles.empty}>
-          Nenhuma avaliação publicada ainda.
-        </p>
-      )}
+      {reviews.length === 0 &&
+        !loading && (
+          <p className={styles.empty}>
+            Nenhuma avaliação publicada
+            ainda.
+          </p>
+        )}
+
+      {/* MODAL DE SEGUIDORES */}
 
       {userListType && (
         <div
-          className={styles.modalOverlay}
-          onClick={() => setUserListType(null)}
+          className={
+            styles.modalOverlay
+          }
+          onClick={() =>
+            setUserListType(null)
+          }
         >
+
           <div
-            className={styles.userListModal}
-            onClick={e => e.stopPropagation()}
+            className={
+              styles.userListModal
+            }
+            onClick={e =>
+              e.stopPropagation()
+            }
           >
 
-            <div className={styles.userListHeader}>
+            <div
+              className={
+                styles.userListHeader
+              }
+            >
 
               <div>
+
                 <h3>
-                  {userListType === 'followers'
+                  {userListType ===
+                  'followers'
                     ? 'Seguidores'
                     : 'Seguindo'}
                 </h3>
@@ -560,10 +1091,13 @@ export default function ProfilePage() {
                     ? 'usuário'
                     : 'usuários'}
                 </span>
+
               </div>
 
               <button
-                className={styles.closeModal}
+                className={
+                  styles.closeModal
+                }
                 onClick={() =>
                   setUserListType(null)
                 }
@@ -573,15 +1107,28 @@ export default function ProfilePage() {
 
             </div>
 
-            <div className={styles.userList}>
+            <div
+              className={
+                styles.userList
+              }
+            >
 
               {loadingUserList ? (
-                <div className={styles.userListLoading}>
+                <div
+                  className={
+                    styles.userListLoading
+                  }
+                >
                   <SpinnerIcon size={22} />
                 </div>
               ) : userList.length === 0 ? (
-                <div className={styles.userListEmpty}>
-                  {userListType === 'followers'
+                <div
+                  className={
+                    styles.userListEmpty
+                  }
+                >
+                  {userListType ===
+                  'followers'
                     ? 'Nenhum seguidor ainda.'
                     : 'Não segue ninguém ainda.'}
                 </div>
@@ -589,29 +1136,47 @@ export default function ProfilePage() {
                 userList.map(profile => (
                   <button
                     key={profile.id}
-                    className={styles.userListItem}
+                    className={
+                      styles.userListItem
+                    }
                     onClick={() => {
-                      setUserListType(null)
+                      setUserListType(
+                        null
+                      )
+
                       navigate(
                         `/profile/${profile.id}`
                       )
                     }}
                   >
 
-                    <div className={styles.userListAvatar}>
+                    <div
+                      className={
+                        styles.userListAvatar
+                      }
+                    >
                       {profile.avatar_url ? (
                         <img
-                          src={profile.avatar_url}
+                          src={
+                            profile.avatar_url
+                          }
                           alt=""
                         />
                       ) : (
                         <span>
-                          {(profile.username || '?')[0].toUpperCase()}
+                          {(
+                            profile.username ||
+                            '?'
+                          )[0].toUpperCase()}
                         </span>
                       )}
                     </div>
 
-                    <div className={styles.userListInfo}>
+                    <div
+                      className={
+                        styles.userListInfo
+                      }
+                    >
 
                       <strong>
                         {profile.full_name ||
@@ -631,6 +1196,7 @@ export default function ProfilePage() {
             </div>
 
           </div>
+
         </div>
       )}
 
