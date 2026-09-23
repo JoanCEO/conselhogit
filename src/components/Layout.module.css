@@ -4,6 +4,10 @@
   flex-direction: column;
 }
 
+/* =========================================
+   HEADER
+   ========================================= */
+
 .header {
   position: sticky;
   top: 0;
@@ -12,9 +16,9 @@
 }
 
 .headerInner {
-  max-width: 1200px;
+  width: min(1440px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 20px 24px;
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -47,7 +51,9 @@
   white-space: nowrap;
 }
 
-/* NAVEGAÇÃO */
+/* =========================================
+   NAVEGAÇÃO DO HEADER
+   ========================================= */
 
 .nav {
   display: flex;
@@ -60,7 +66,10 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--grey-500);
-  transition: all var(--transition);
+  text-decoration: none;
+  transition:
+    color var(--transition),
+    background var(--transition);
 }
 
 .navLink:hover {
@@ -76,7 +85,9 @@
   gap: 12px;
 }
 
-/* AVATAR */
+/* =========================================
+   AVATAR
+   ========================================= */
 
 .avatarWrap {
   position: relative;
@@ -109,7 +120,9 @@
   object-fit: cover;
 }
 
-/* MENU DO PERFIL */
+/* =========================================
+   MENU DO PERFIL
+   ========================================= */
 
 .menu {
   position: absolute;
@@ -122,6 +135,7 @@
   min-width: 160px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   animation: fadeUp 0.15s ease;
+  z-index: 1100;
 }
 
 .menuItem {
@@ -134,13 +148,18 @@
   color: var(--black);
   transition: background var(--transition);
   text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .menuItem:hover {
   background: var(--grey-100);
 }
 
-/* BOTÃO NOVA AVALIAÇÃO */
+/* =========================================
+   BOTÃO NOVA AVALIAÇÃO
+   ========================================= */
 
 .addBtn {
   width: 40px;
@@ -164,27 +183,138 @@
   background: var(--grey-600);
 }
 
-/* LINHA DO HEADER */
+/* =========================================
+   LINHA DO HEADER
+   ========================================= */
 
 .headerLine {
   height: 1px;
   background: var(--black);
+  width: min(1440px, calc(100% - 48px));
   margin: 0 auto;
-  max-width: 1200px;
-  width: calc(100% - 48px);
 }
 
-/* CONTEÚDO */
+/* =========================================
+   CONTEÚDO PRINCIPAL
+   ========================================= */
 
 .main {
   flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
   padding: 40px 24px;
 }
 
-/* BACKDROP */
+.layoutArea {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 32px;
+
+  align-items: start;
+}
+
+.pageContent {
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================
+   PAINEL LATERAL
+   ========================================= */
+
+.sidePanel {
+  position: sticky;
+  top: 110px;
+
+  width: 190px;
+
+  padding: 18px 12px;
+
+  background: #000;
+  color: #fff;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.sidePanelHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  padding: 4px 8px 14px;
+
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.sidePanelHeader span {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.sidePanelHeader small {
+  color: #888;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.sideNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.sideNavItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-height: 40px;
+
+  padding: 9px 10px;
+
+  border-radius: 8px;
+
+  color: #aaa;
+  text-decoration: none;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.sideNavItem:hover {
+  background: #181818;
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.sideNavIcon {
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+/* =========================================
+   BACKDROP
+   ========================================= */
 
 .backdrop {
   position: fixed;
@@ -192,22 +322,31 @@
   z-index: 99;
 }
 
-/* BOTÃO HAMBURGER */
+/* =========================================
+   BOTÃO HAMBURGER
+   ========================================= */
 
 .mobileMenuBtn {
   display: none;
+
   width: 38px;
   height: 38px;
+
   border: 1px solid var(--grey-200);
   border-radius: 10px;
+
   background: var(--white);
   color: var(--black);
+
   align-items: center;
   justify-content: center;
+
   cursor: pointer;
 }
 
-/* MENU MOBILE */
+/* =========================================
+   MENU MOBILE
+   ========================================= */
 
 .mobileMenu {
   display: none;
@@ -217,100 +356,27 @@
   display: flex;
   align-items: center;
   gap: 10px;
+
   width: 100%;
+
   padding: 14px 16px;
+
   background: transparent;
   border: none;
+
   color: var(--black);
+
   font-size: 14px;
   font-weight: 500;
+
   text-align: left;
   text-decoration: none;
+
   cursor: pointer;
 }
 
 .mobileMenuItem:hover {
   background: var(--grey-100);
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-  .headerInner {
-    padding: 12px 16px;
-    min-height: 64px;
-  }
-
-  .logo {
-    font-size: 17px;
-    letter-spacing: -0.4px;
-    white-space: nowrap;
-  }
-
-  .version {
-    font-size: 7px;
-    margin-left: 4px;
-  }
-
-  .nav {
-    display: none;
-  }
-
-  .headerRight {
-    gap: 8px;
-  }
-
-  .avatar {
-    width: 34px;
-    height: 34px;
-  }
-
-  /* BOTÃO FLUTUANTE */
-
-  .addBtn {
-    display: flex;
-    position: fixed;
-    left: 20px;
-    bottom: 20px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    z-index: 150;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-  }
-
-  /* HAMBURGER */
-
-  .mobileMenuBtn {
-    display: flex;
-  }
-
-  /* MENU MOBILE */
-
-  .mobileMenu {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 12px;
-    right: 12px;
-    background: var(--white);
-    border: 1px solid var(--grey-200);
-    border-radius: var(--radius-md);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    animation: fadeUp 0.15s ease;
-  }
-
-  .headerLine {
-    width: calc(100% - 32px);
-  }
-
-  .main {
-    padding: 24px 16px;
-  }
 }
 
 /* =========================================
@@ -319,22 +385,29 @@
 
 .notificationWrap {
   position: relative;
+
   display: flex;
   align-items: center;
 }
 
 .notificationBtn {
   position: relative;
+
   width: 38px;
   height: 38px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border: 1px solid transparent;
   border-radius: 50%;
+
   background: transparent;
   color: var(--black);
+
   cursor: pointer;
+
   transition: all var(--transition);
 }
 
@@ -345,44 +418,65 @@
 
 .notificationBadge {
   position: absolute;
+
   top: -3px;
   right: -3px;
+
   min-width: 17px;
   height: 17px;
+
   padding: 0 4px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 999px;
+
   background: #fff;
   color: #000;
+
   border: 1px solid #000;
+
   font-size: 9px;
   font-weight: 800;
+
   line-height: 1;
 }
 
 .notificationPanel {
   position: absolute;
+
   top: calc(100% + 12px);
   right: 0;
+
   width: 360px;
   max-width: calc(100vw - 30px);
+
   background: var(--white);
+
   border: 1px solid var(--grey-200);
   border-radius: var(--radius);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.12);
+
   overflow: hidden;
+
   z-index: 1000;
 }
 
 .notificationHeader {
   min-height: 52px;
+
   padding: 12px 16px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 12px;
+
   border-bottom: 1px solid var(--grey-200);
 }
 
@@ -394,9 +488,12 @@
 .markAllBtn {
   border: none;
   background: transparent;
+
   color: var(--grey-500);
+
   font-size: 11px;
   font-weight: 600;
+
   cursor: pointer;
 }
 
@@ -411,16 +508,24 @@
 
 .notificationItem {
   width: 100%;
+
   padding: 13px 16px;
+
   display: flex;
   align-items: flex-start;
+
   gap: 10px;
+
   border: none;
   border-bottom: 1px solid var(--grey-100);
+
   background: var(--white);
   color: var(--black);
+
   text-align: left;
+
   cursor: pointer;
+
   transition: background var(--transition);
 }
 
@@ -432,9 +537,7 @@
   background: var(--grey-100);
 }
 
-/* =========================================
-   NÃO LIDA
-   ========================================= */
+/* NÃO LIDA */
 
 .notificationUnread {
   background: var(--white);
@@ -452,6 +555,7 @@
   width: 8px;
   min-width: 8px;
   height: 20px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -460,27 +564,34 @@
 .notificationDot span {
   width: 7px;
   height: 7px;
+
   display: block;
+
   border-radius: 50%;
+
   background: #fff;
   border: 1px solid #000;
 }
 
 .notificationContent {
   min-width: 0;
+
   display: flex;
   flex-direction: column;
+
   gap: 4px;
 }
 
 .notificationContent strong {
   font-size: 12px;
   font-weight: 700;
+
   color: var(--black);
 }
 
 .notificationContent span {
   color: var(--grey-500);
+
   font-size: 12px;
   line-height: 1.45;
 }
@@ -492,15 +603,49 @@
 
 .emptyNotifications {
   min-height: 150px;
+
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
+
   gap: 10px;
+
   color: var(--grey-400);
+
   font-size: 12px;
 }
 
+/* =========================================
+   DESKTOP MENOR
+   ========================================= */
+
+@media (max-width: 1200px) {
+  .layoutArea {
+    grid-template-columns: minmax(0, 1fr) 175px;
+    gap: 24px;
+  }
+
+  .sidePanel {
+    width: 175px;
+  }
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1050px) {
+  .sidePanel {
+    display: none;
+  }
+
+  .layoutArea {
+    display: block;
+    width: 100%;
+  }
+}
 
 /* =========================================
    MOBILE
@@ -509,7 +654,8 @@
 @media (max-width: 600px) {
 
   .headerInner {
-    padding: 10px 14px;
+    width: calc(100% - 28px);
+    min-height: 60px;
   }
 
   .logoWrap {
@@ -520,19 +666,21 @@
   .logo {
     font-size: 13px;
     white-space: nowrap;
+    letter-spacing: -0.4px;
   }
 
   .version {
     font-size: 8px;
+    margin-left: 4px;
+  }
+
+  .nav {
+    display: none;
   }
 
   .headerRight {
     gap: 5px;
     flex-shrink: 0;
-  }
-
-  .nav {
-    display: none;
   }
 
   .addBtn {
@@ -550,10 +698,15 @@
   }
 
   .mobileMenuBtn {
+    display: flex;
+
     order: 3;
+
     flex-shrink: 0;
+
     width: 36px;
     height: 36px;
+
     padding: 0;
   }
 
@@ -572,13 +725,61 @@
     right: -2px;
   }
 
+  /* MENU MOBILE */
+
+  .mobileMenu {
+    display: block;
+
+    position: absolute;
+
+    top: 100%;
+    left: 12px;
+    right: 12px;
+
+    background: var(--white);
+
+    border: 1px solid var(--grey-200);
+    border-radius: var(--radius-md);
+
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.08);
+
+    overflow: hidden;
+
+    animation: fadeUp 0.15s ease;
+  }
+
+  /* LINHA */
+
+  .headerLine {
+    width: calc(100% - 28px);
+  }
+
+  /* CONTEÚDO */
+
+  .main {
+    padding: 24px 16px;
+  }
+
+  .layoutArea {
+    width: 100%;
+    display: block;
+  }
+
+  .pageContent {
+    width: 100%;
+  }
+
+  /* NOTIFICAÇÕES */
+
   .notificationPanel {
     position: fixed;
+
     top: 68px;
     right: 12px;
     left: 12px;
+
     width: auto;
     max-width: none;
   }
-
 }

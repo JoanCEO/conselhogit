@@ -1,0 +1,345 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal {
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: visible;
+  animation: fadeUp 0.2s ease;
+}
+
+.modalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 0;
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.closeBtn {
+  color: var(--grey-400);
+  transition: color var(--transition);
+  padding: 4px;
+}
+
+.closeBtn:hover {
+  color: var(--black);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey-500);
+  letter-spacing: 0.03em;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--black);
+  background: var(--white);
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.input,
+.select {
+  height: auto;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--black);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--grey-400);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.select {
+  cursor: pointer;
+}
+
+.error {
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--black);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background var(--transition),
+    transform var(--transition);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--grey-600);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   BUSCA DE MÚSICA
+========================= */
+
+.musicSearch {
+  position: relative;
+}
+
+.musicSearchLoading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.musicResults {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  background: #151515;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.musicResult {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 0;
+  border-bottom: 1px solid #252525;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.musicResult:last-child {
+  border-bottom: 0;
+}
+
+.musicResult:hover {
+  background: #202020;
+}
+
+.musicImage,
+.musicImagePlaceholder {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.musicImagePlaceholder {
+  background: #252525;
+}
+
+.musicInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.musicInfo strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.musicInfo span {
+  overflow: hidden;
+  font-size: 12px;
+  opacity: 0.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.musicInfo small {
+  overflow: hidden;
+  font-size: 11px;
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   MÚSICA SELECIONADA
+========================= */
+
+.selectedMusic {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  background: var(--grey-100);
+}
+
+.selectedMusicImage {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.selectedMusicInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.selectedMusicInfo strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedMusicInfo span {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--grey-500);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedMusicInfo small {
+  overflow: hidden;
+  font-size: 11px;
+  color: var(--grey-400);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .musicResults {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 9999;
+  }
+
+  .musicResult {
+    padding: 12px;
+  }
+
+  .musicImage,
+  .musicImagePlaceholder {
+    width: 45px;
+    height: 45px;
+  }
+
+  .musicInfo strong {
+    font-size: 13px;
+  }
+
+  .musicInfo span {
+    font-size: 11px;
+  }
+
+  .musicInfo small {
+    font-size: 10px;
+  }
+
+  .selectedMusicImage {
+    width: 52px;
+    height: 52px;
+  }
+}

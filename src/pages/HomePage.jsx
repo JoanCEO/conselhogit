@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import ReviewCard from '../components/ReviewCard'
-import ReviewModal from '../components/ReviewModal'
-import { SearchIcon, SpinnerIcon, PlusIcon } from '../components/Icons'
+import { SearchIcon, SpinnerIcon } from '../components/Icons'
 import styles from './HomePage.module.css'
 
 const FILTERS = [
@@ -29,7 +28,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('Todos')
   const [search, setSearch] = useState('')
-  const [showReviewModal, setShowReviewModal] = useState(false)
 
   const GAME_TYPES = [
     'Online',
@@ -288,32 +286,6 @@ export default function HomePage() {
             />
           ))}
         </div>
-      )}
-
-      {/* BOTÃO MOBILE - NOVA AVALIAÇÃO */}
-
-      <button
-        type="button"
-        className={styles.mobileCreateButton}
-        onClick={() => setShowReviewModal(true)}
-        aria-label="Nova avaliação"
-        title="Nova avaliação"
-      >
-        <PlusIcon size={22} />
-      </button>
-
-      {/* MODAL DE NOVA AVALIAÇÃO */}
-
-      {showReviewModal && (
-        <ReviewModal
-          onClose={created => {
-            setShowReviewModal(false)
-
-            if (created) {
-              fetchData()
-            }
-          }}
-        />
       )}
 
     </div>

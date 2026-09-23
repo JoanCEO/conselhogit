@@ -1,0 +1,279 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.card:hover {
+  border-color: var(--black);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.genre,
+.type {
+  display: inline-flex;
+  align-items: center;
+  max-width: 180px;
+  overflow: hidden;
+  padding: 4px 8px;
+  border: 1px solid var(--grey-200);
+  border-radius: 20px;
+  color: var(--grey-500);
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.type {
+  max-width: 220px;
+}
+
+.rating {
+  flex-shrink: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artist {
+  margin: -5px 0 0;
+  overflow: hidden;
+  color: var(--grey-500);
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.musicCover {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--grey-100);
+}
+
+.musicCover img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--black);
+}
+
+.comment {
+  margin: 0;
+  color: var(--grey-500);
+  font-size: 13px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--grey-100);
+}
+
+.author {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.authorAvatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--grey-200);
+  border-radius: 50%;
+  background: var(--grey-100);
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.authorAvatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.authorName,
+.date {
+  display: block;
+}
+
+.authorName {
+  max-width: 120px;
+  overflow: hidden;
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date {
+  margin-top: 2px;
+  color: var(--grey-400);
+  font-size: 10px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.commentCount,
+.reactionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  color: var(--grey-400);
+  font-size: 11px;
+}
+
+.commentCount {
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    background var(--transition);
+}
+
+.commentCount:hover {
+  color: var(--black);
+  background: var(--grey-100);
+}
+
+.reactionBtn {
+  padding: 0 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    background var(--transition),
+    border-color var(--transition);
+}
+
+.reactionBtn:hover {
+  color: var(--black);
+  background: var(--grey-100);
+}
+
+.reactionBtn.active {
+  color: var(--black);
+  border-color: var(--grey-200);
+  background: var(--grey-100);
+}
+
+.reactionBtn span {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+  }
+
+  .musicCover {
+    height: 160px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .footer {
+    align-items: flex-end;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 420px) {
+  .musicCover {
+    height: 140px;
+  }
+
+  .actions {
+    gap: 2px;
+  }
+
+  .reactionBtn {
+    min-width: 25px;
+    padding: 0 4px;
+  }
+
+  .commentCount {
+    min-width: 25px;
+  }
+}

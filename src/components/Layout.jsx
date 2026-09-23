@@ -1,40 +1,70 @@
 import { Outlet, useNavigate, Link } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import {
   PlusIcon,
   UserIcon,
   LogOutIcon,
+  GamepadIcon,
+  MusicIcon,
+  MegaphoneIcon,
+  GavelIcon,
+  LinkIcon,
+  BellIcon,
   MenuIcon,
-  XIcon,
-  BellIcon
+  XIcon
 } from './Icons'
 import ReviewModal from './ReviewModal'
 import styles from './Layout.module.css'
 
 export default function Layout() {
-  const { profile, user, signOut } = useAuth()
+  const {
+    user,
+    profile,
+    signOut
+  } = useAuth()
+
   const navigate = useNavigate()
 
-  const [showModal, setShowModal] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
 
   const [notifications, setNotifications] = useState([])
   const [showNotifications, setShowNotifications] = useState(false)
-
-  const notificationRef = useRef(null)
 
   const unreadCount = notifications.filter(
     notification => !notification.read
   ).length
 
-  /*
-   * =========================================
-   * NOTIFICAÇÕES EM TEMPO REAL
-   * =========================================
-   */
+  const sideNavigation = [
+    {
+      label: 'Avaliações',
+      path: '/',
+      icon: <GamepadIcon size={17} />
+    },
+    {
+      label: 'Músicas',
+      path: '/musicas',
+      icon: <MusicIcon size={17} />
+    },
+    {
+      label: 'Convocações',
+      path: '/convocacoes',
+      icon: <MegaphoneIcon size={17} />
+    },
+    {
+      label: 'Julgamento',
+      path: '/julgamento',
+      icon: <GavelIcon size={17} />
+    },
+    {
+      label: 'Links',
+      path: '/links',
+      icon: <LinkIcon size={17} />
+    }
+  ]
 
   useEffect(() => {
     if (!user?.id) return
@@ -53,16 +83,9 @@ export default function Layout() {
         payload => {
           if (!mounted) return
 
-          // Só adiciona notificações destinadas
-          // ao usuário atualmente logado
           if (payload.new.user_id !== user.id) {
             return
           }
-
-          console.log(
-            'Nova notificação recebida em tempo real:',
-            payload.new
-          )
 
           setNotifications(current => {
             const exists = current.some(
@@ -111,10 +134,6 @@ export default function Layout() {
         )
       })
 
-    /*
-     * Busca as notificações existentes
-     * depois de iniciar o Realtime.
-     */
     const loadNotifications = async () => {
       const { data, error } = await supabase
         .from('notifications')
@@ -146,66 +165,22 @@ export default function Layout() {
     }
   }, [user?.id])
 
-  /*
-   * =========================================
-   * FECHAR NOTIFICAÇÕES AO CLICAR FORA
-   * =========================================
-   */
-
-  useEffect(() => {
-    const handleClickOutside = event => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
-        setShowNotifications(false)
-      }
-    }
-
-    document.addEventListener(
-      'mousedown',
-      handleClickOutside
-    )
-
-    return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      )
-    }
-  }, [])
-
-  /*
-   * =========================================
-   * MARCAR NOTIFICAÇÃO COMO LIDA
-   * =========================================
-   */
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/auth')
+  }
 
   const markAsRead = async notification => {
     if (!notification.read) {
-      const { error } = await supabase
+      await supabase
         .from('notifications')
-        .update({
-          read: true
-        })
+        .update({ read: true })
         .eq('id', notification.id)
-        .eq('user_id', user.id)
-
-      if (error) {
-        console.error(
-          'Erro ao marcar notificação como lida:',
-          error
-        )
-        return
-      }
 
       setNotifications(current =>
         current.map(item =>
           item.id === notification.id
-            ? {
-                ...item,
-                read: true
-              }
+            ? { ...item, read: true }
             : item
         )
       )
@@ -214,9 +189,12 @@ export default function Layout() {
     setShowNotifications(false)
 
     if (notification.review_id) {
-      navigate(
-        `/review/${notification.review_id}`
-      )
+      navigate(`/review/${notification.review_id}`)
+      return
+    }
+
+    if (notification.music_review_id) {
+      navigate(`/musica/${notification.music_review_id}`)
       return
     }
 
@@ -227,38 +205,18 @@ export default function Layout() {
 
     if (notification.julgamento_id) {
       navigate('/julgamento')
+      return
     }
   }
 
-  /*
-   * =========================================
-   * MARCAR TODAS COMO LIDAS
-   * =========================================
-   */
-
   const markAllAsRead = async () => {
-    if (
-      !user?.id ||
-      unreadCount === 0
-    ) {
-      return
-    }
+    if (!user?.id) return
 
-    const { error } = await supabase
+    await supabase
       .from('notifications')
-      .update({
-        read: true
-      })
+      .update({ read: true })
       .eq('user_id', user.id)
       .eq('read', false)
-
-    if (error) {
-      console.error(
-        'Erro ao marcar notificações como lidas:',
-        error
-      )
-      return
-    }
 
     setNotifications(current =>
       current.map(notification => ({
@@ -268,57 +226,42 @@ export default function Layout() {
     )
   }
 
-  /*
-   * =========================================
-   * LOGOUT
-   * =========================================
-   */
-
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/auth')
-  }
-
-  const closeMobileMenu = () => {
-    setShowMobileMenu(false)
-  }
-
-  /*
-   * =========================================
-   * TEMPO DA NOTIFICAÇÃO
-   * =========================================
-   */
-
-  const formatNotificationTime = date => {
+  const formatNotificationDate = date => {
     if (!date) return ''
 
     const notificationDate = new Date(date)
     const now = new Date()
 
-    const difference = Math.floor(
-      (now - notificationDate) / 1000
+    const diff =
+      now.getTime() -
+      notificationDate.getTime()
+
+    const minutes = Math.floor(
+      diff / 60000
     )
 
-    if (difference < 60) {
-      return 'Agora'
+    if (minutes < 1) {
+      return 'agora'
     }
 
-    if (difference < 3600) {
-      return `${Math.floor(
-        difference / 60
-      )} min atrás`
+    if (minutes < 60) {
+      return `${minutes} min`
     }
 
-    if (difference < 86400) {
-      return `${Math.floor(
-        difference / 3600
-      )} h atrás`
+    const hours = Math.floor(
+      minutes / 60
+    )
+
+    if (hours < 24) {
+      return `${hours}h`
     }
 
-    if (difference < 604800) {
-      return `${Math.floor(
-        difference / 86400
-      )} d atrás`
+    const days = Math.floor(
+      hours / 24
+    )
+
+    if (days < 7) {
+      return `${days}d`
     }
 
     return notificationDate.toLocaleDateString(
@@ -333,391 +276,352 @@ export default function Layout() {
 
         <div className={styles.headerInner}>
 
-          {/* LOGO */}
-
           <Link
             to="/"
             className={styles.logoWrap}
+            onClick={() => {
+              setShowMobileMenu(false)
+              setShowProfileMenu(false)
+              setShowNotifications(false)
+            }}
           >
             <span className={styles.logo}>
               O CONSELHO BLAZE
             </span>
           </Link>
 
-          {/* LADO DIREITO */}
-
           <div className={styles.headerRight}>
 
-            {/* NAVEGAÇÃO DESKTOP */}
-
-            <nav className={styles.nav}>
-
-              <Link
-                to="/"
-                className={styles.navLink}
-              >
-                Avaliações
-              </Link>
-
-              <Link
-                to="/convocacoes"
-                className={styles.navLink}
-              >
-                Convocações
-              </Link>
-
-              <Link
-                to="/julgamento"
-                className={styles.navLink}
-              >
-                Julgamento
-              </Link>
-
-              <Link
-                to="/links"
-                className={styles.navLink}
-              >
-                Links
-              </Link>
-
-            </nav>
-
-            {/* AVATAR */}
-
-            <div
-              className={styles.avatarWrap}
-              onClick={() =>
-                setShowMenu(value => !value)
-              }
-            >
-
-              <div className={styles.avatar}>
-
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt=""
-                  />
-                ) : (
-                  <span>
-                    {(
-                      profile?.username || '?'
-                    )[0].toUpperCase()}
-                  </span>
-                )}
-
-              </div>
-
-              {showMenu && (
-                <div
-                  className={styles.menu}
-                  onClick={event =>
-                    event.stopPropagation()
-                  }
-                >
-
-                  <button
-                    onClick={() => {
-                      navigate(
-                        `/profile/${profile?.id}`
-                      )
-                      setShowMenu(false)
-                    }}
-                    className={styles.menuItem}
-                  >
-                    <UserIcon size={16} />
-                    Meu Perfil
-                  </button>
-
-                  <button
-                    onClick={handleSignOut}
-                    className={styles.menuItem}
-                  >
-                    <LogOutIcon size={16} />
-                    Sair
-                  </button>
-
-                </div>
-              )}
-
-            </div>
-
-            {/* NOTIFICAÇÕES */}
-
-            <div
-              className={styles.notificationWrap}
-              ref={notificationRef}
-            >
-
+            {user && (
               <button
-                className={styles.notificationBtn}
+                type="button"
+                className={styles.addBtn}
                 onClick={() =>
-                  setShowNotifications(
-                    value => !value
-                  )
+                  setShowReviewModal(true)
                 }
-                aria-label="Notificações"
-                title="Notificações"
+                title="Nova avaliação"
               >
-
-                <BellIcon size={20} />
-
-                {unreadCount > 0 && (
-                  <span
-                    className={
-                      styles.notificationBadge
-                    }
-                  >
-                    {unreadCount > 99
-                      ? '99+'
-                      : unreadCount}
-                  </span>
-                )}
-
+                <PlusIcon size={19} />
               </button>
+            )}
 
-              {showNotifications && (
-                <div
-                  className={
-                    styles.notificationPanel
+            {user && (
+              <div className={styles.notificationWrap}>
+
+                <button
+                  type="button"
+                  className={styles.notificationBtn}
+                  onClick={() =>
+                    setShowNotifications(
+                      current => !current
+                    )
                   }
+                  aria-label="Notificações"
                 >
+                  <BellIcon size={19} />
 
+                  {unreadCount > 0 && (
+                    <span
+                      className={
+                        styles.notificationBadge
+                      }
+                    >
+                      {unreadCount > 99
+                        ? '99+'
+                        : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifications && (
                   <div
                     className={
-                      styles.notificationHeader
+                      styles.notificationPanel
                     }
                   >
 
-                    <strong>
-                      Notificações
-                    </strong>
+                    <div
+                      className={
+                        styles.notificationHeader
+                      }
+                    >
+                      <strong>
+                        Notificações
+                      </strong>
 
-                    {unreadCount > 0 && (
-                      <button
-                        className={
-                          styles.markAllBtn
-                        }
-                        onClick={markAllAsRead}
-                      >
-                        Marcar todas como lidas
-                      </button>
-                    )}
+                      {unreadCount > 0 && (
+                        <button
+                          type="button"
+                          className={
+                            styles.markAllBtn
+                          }
+                          onClick={
+                            markAllAsRead
+                          }
+                        >
+                          Marcar como lidas
+                        </button>
+                      )}
+                    </div>
 
-                  </div>
+                    <div
+                      className={
+                        styles.notificationList
+                      }
+                    >
 
-                  <div
-                    className={
-                      styles.notificationList
-                    }
-                  >
-
-                    {notifications.length === 0 ? (
-
-                      <div
-                        className={
-                          styles.emptyNotifications
-                        }
-                      >
-                        <BellIcon size={22} />
-
-                        <span>
-                          Nenhuma notificação
-                        </span>
-                      </div>
-
-                    ) : (
-
-                      notifications.map(
-                        notification => (
-
-                          <button
-                            key={notification.id}
-                            className={`
-                              ${styles.notificationItem}
-                              ${
-                                !notification.read
-                                  ? styles.notificationUnread
-                                  : ''
+                      {notifications.length === 0 ? (
+                        <div
+                          className={
+                            styles.emptyNotifications
+                          }
+                        >
+                          Nenhuma notificação.
+                        </div>
+                      ) : (
+                        notifications.map(
+                          notification => (
+                            <button
+                              key={
+                                notification.id
                               }
-                            `}
-                            onClick={() =>
-                              markAsRead(
-                                notification
-                              )
-                            }
-                          >
-
-                            <div
-                              className={
-                                styles.notificationDot
+                              type="button"
+                              className={`
+                                ${styles.notificationItem}
+                                ${
+                                  !notification.read
+                                    ? styles.notificationUnread
+                                    : ''
+                                }
+                              `}
+                              onClick={() =>
+                                markAsRead(
+                                  notification
+                                )
                               }
                             >
 
-                              {!notification.read && (
-                                <span />
-                              )}
+                              <div
+                                className={
+                                  styles.notificationDot
+                                }
+                              >
+                                {!notification.read && (
+                                  <span />
+                                )}
+                              </div>
 
-                            </div>
+                              <div
+                                className={
+                                  styles.notificationContent
+                                }
+                              >
+                                <strong>
+                                  {
+                                    notification.title
+                                  }
+                                </strong>
 
-                            <div
-                              className={
-                                styles.notificationContent
-                              }
-                            >
-
-                              <strong>
-                                {notification.title}
-                              </strong>
-
-                              {notification.content && (
                                 <span>
                                   {
                                     notification.content
                                   }
                                 </span>
-                              )}
 
-                              <small>
-                                {formatNotificationTime(
-                                  notification.created_at
-                                )}
-                              </small>
+                                <small>
+                                  {formatNotificationDate(
+                                    notification.created_at
+                                  )}
+                                </small>
+                              </div>
 
-                            </div>
-
-                          </button>
-
+                            </button>
+                          )
                         )
-                      )
+                      )}
 
-                    )}
-
+                    </div>
                   </div>
+                )}
 
-                </div>
-              )}
+              </div>
+            )}
 
-            </div>
+            {user && (
+              <div
+                className={styles.avatarWrap}
+              >
 
-            {/* NOVA AVALIAÇÃO */}
+                <button
+                  type="button"
+                  className={styles.avatar}
+                  onClick={() =>
+                    setShowProfileMenu(
+                      current => !current
+                    )
+                  }
+                  aria-label="Perfil"
+                >
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt=""
+                    />
+                  ) : (
+                    <span>
+                      {(
+                        profile?.username ||
+                        user.email ||
+                        '?'
+                      )[0].toUpperCase()}
+                    </span>
+                  )}
+                </button>
+
+                {showProfileMenu && (
+                  <div
+                    className={styles.menu}
+                  >
+                    <Link
+                      to={`/profile/${user.id}`}
+                      className={
+                        styles.menuItem
+                      }
+                      onClick={() =>
+                        setShowProfileMenu(false)
+                      }
+                    >
+                      <UserIcon size={17} />
+                      Perfil
+                    </Link>
+
+                    <button
+                      type="button"
+                      className={
+                        styles.menuItem
+                      }
+                      onClick={handleSignOut}
+                    >
+                      <LogOutIcon size={17} />
+                      Sair
+                    </button>
+                  </div>
+                )}
+
+              </div>
+            )}
 
             <button
-              className={styles.addBtn}
-              onClick={() =>
-                setShowModal(true)
+              type="button"
+              className={
+                styles.mobileMenuBtn
               }
-              title="Nova avaliação"
-            >
-              <PlusIcon size={20} />
-            </button>
-
-            {/* HAMBURGER */}
-
-            <button
-              className={styles.mobileMenuBtn}
               onClick={() =>
                 setShowMobileMenu(
-                  value => !value
+                  current => !current
                 )
               }
               aria-label="Abrir menu"
             >
-
               {showMobileMenu ? (
-                <XIcon size={22} />
+                <XIcon size={20} />
               ) : (
-                <MenuIcon size={22} />
+                <MenuIcon size={20} />
               )}
-
             </button>
 
           </div>
 
         </div>
 
-        {/* MENU MOBILE */}
+        <div className={styles.headerLine} />
 
         {showMobileMenu && (
-          <div className={styles.mobileMenu}>
+          <div
+            className={styles.mobileMenu}
+          >
 
-            <Link
-              to="/"
-              className={styles.mobileMenuItem}
-              onClick={closeMobileMenu}
-            >
-              Avaliações
-            </Link>
-
-            <Link
-              to="/convocacoes"
-              className={styles.mobileMenuItem}
-              onClick={closeMobileMenu}
-            >
-              Convocações
-            </Link>
-
-            <Link
-              to="/julgamento"
-              className={styles.mobileMenuItem}
-              onClick={closeMobileMenu}
-            >
-              Julgamento
-            </Link>
-
-            <Link
-              to="/links"
-              className={styles.mobileMenuItem}
-              onClick={closeMobileMenu}
-            >
-              Links
-            </Link>
-
-            <button
-              className={styles.mobileMenuItem}
-              onClick={() => {
-                navigate(
-                  `/profile/${profile?.id}`
-                )
-                closeMobileMenu()
-              }}
-            >
-              <UserIcon size={16} />
-              Meu Perfil
-            </button>
-
-            <button
-              className={styles.mobileMenuItem}
-              onClick={handleSignOut}
-            >
-              <LogOutIcon size={16} />
-              Sair
-            </button>
+            {sideNavigation.map(item => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={
+                  styles.mobileMenuItem
+                }
+                onClick={() =>
+                  setShowMobileMenu(false)
+                }
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
 
           </div>
         )}
 
-        <div className={styles.headerLine} />
-
       </header>
 
       <main className={styles.main}>
-        <Outlet />
+
+        <div className={styles.layoutArea}>
+
+          <div className={styles.pageContent}>
+            <Outlet />
+          </div>
+
+          <aside className={styles.sidePanel}>
+
+            <div
+              className={
+                styles.sidePanelHeader
+              }
+            >
+              <span>
+                CONSELHO BLAZE
+              </span>
+
+              <small>
+                NAVEGAÇÃO
+              </small>
+            </div>
+
+            <nav className={styles.sideNav}>
+
+              {sideNavigation.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={
+                    styles.sideNavItem
+                  }
+                >
+                  <span
+                    className={
+                      styles.sideNavIcon
+                    }
+                  >
+                    {item.icon}
+                  </span>
+
+                  <span>
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+
+            </nav>
+
+          </aside>
+
+        </div>
+
       </main>
 
-      {showModal && (
+      {showReviewModal && (
         <ReviewModal
           onClose={() =>
-            setShowModal(false)
-          }
-        />
-      )}
-
-      {showMenu && (
-        <div
-          className={styles.backdrop}
-          onClick={() =>
-            setShowMenu(false)
+            setShowReviewModal(false)
           }
         />
       )}

@@ -8,6 +8,7 @@ import {
   EditIcon
 } from '../components/Icons'
 import ReviewCard from '../components/ReviewCard'
+import MusicReviewCard from '../components/MusicReviewCard'
 import styles from './ProfilePage.module.css'
 
 export default function ProfilePage() {
@@ -16,8 +17,14 @@ export default function ProfilePage() {
   const { user, updateProfile } = useAuth()
 
   const [profile, setProfile] = useState(null)
+
   const [reviews, setReviews] = useState([])
   const [reactions, setReactions] = useState([])
+
+  const [musicReviews, setMusicReviews] = useState([])
+  const [musicReactions, setMusicReactions] = useState([])
+
+  const [activeSection, setActiveSection] = useState('games')
 
   const [followersCount, setFollowersCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
@@ -47,12 +54,20 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       setLoading(true)
 
-      const { data: p, error: profileError } =
-        await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', id)
-          .single()
+      /*
+        =====================================================
+        PERFIL
+        =====================================================
+      */
+
+      const {
+        data: p,
+        error: profileError
+      } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single()
 
       if (profileError) {
         console.error(
@@ -73,16 +88,24 @@ export default function ProfilePage() {
         })
       }
 
-      const { data: rv, error: reviewsError } =
-        await supabase
-          .from('reviews')
-          .select(
-            '*, profiles:user_id(username, full_name, avatar_url)'
-          )
-          .eq('user_id', id)
-          .order('created_at', {
-            ascending: false
-          })
+      /*
+        =====================================================
+        AVALIAÇÕES DE JOGOS
+        =====================================================
+      */
+
+      const {
+        data: rv,
+        error: reviewsError
+      } = await supabase
+        .from('reviews')
+        .select(
+          '*, profiles:user_id(username, full_name, avatar_url)'
+        )
+        .eq('user_id', id)
+        .order('created_at', {
+          ascending: false
+        })
 
       if (reviewsError) {
         console.error(
@@ -100,14 +123,27 @@ export default function ProfilePage() {
 
       setReviews(mapped)
 
-      const ids = (rv || []).map(r => r.id)
+      /*
+        =====================================================
+        REAÇÕES DE JOGOS
+        =====================================================
+      */
 
-      if (ids.length) {
-        const { data: rcts, error: reactionsError } =
-          await supabase
-            .from('reactions')
-            .select('*')
-            .in('review_id', ids)
+      const reviewIds = (rv || []).map(
+        r => r.id
+      )
+
+      if (reviewIds.length) {
+        const {
+          data: rcts,
+          error: reactionsError
+        } = await supabase
+          .from('reactions')
+          .select('*')
+          .in(
+            'review_id',
+            reviewIds
+          )
 
         if (reactionsError) {
           console.error(
@@ -121,35 +157,151 @@ export default function ProfilePage() {
         setReactions([])
       }
 
-      const { count: followers } = await supabase
+      /*
+        =====================================================
+        AVALIAÇÕES MUSICAIS
+        =====================================================
+      */
+
+      const {
+        data: mr,
+        error: musicReviewsError
+      } = await supabase
+        .from('music_reviews')
+        .select('*')
+        .eq('user_id', id)
+        .order('created_at', {
+          ascending: false
+        })
+
+      if (musicReviewsError) {
+        console.error(
+          'Erro ao buscar avaliações musicais:',
+          musicReviewsError
+        )
+      }
+
+      const mappedMusicReviews =
+        (mr || []).map(r => ({
+          ...r,
+          username: p?.username,
+          avatar_url: p?.avatar_url,
+          profile_id: p?.id,
+          comment_count: 0
+        }))
+
+      setMusicReviews(
+        mappedMusicReviews
+      )
+
+      /*
+        =====================================================
+        REAÇÕES DE MÚSICAS
+        =====================================================
+      */
+
+      const musicReviewIds =
+        (mr || []).map(
+          r => r.id
+        )
+
+      if (musicReviewIds.length) {
+        const {
+          data: musicRcts,
+          error: musicReactionsError
+        } = await supabase
+          .from('music_reactions')
+          .select('*')
+          .in(
+            'music_review_id',
+            musicReviewIds
+          )
+
+        if (musicReactionsError) {
+          console.error(
+            'Erro ao buscar reações musicais:',
+            musicReactionsError
+          )
+        }
+
+        setMusicReactions(
+          musicRcts || []
+        )
+      } else {
+        setMusicReactions([])
+      }
+
+      /*
+        =====================================================
+        SEGUIDORES
+        =====================================================
+      */
+
+      const {
+        count: followers
+      } = await supabase
         .from('seguidores')
         .select('*', {
           count: 'exact',
           head: true
         })
-        .eq('seguido_id', id)
+        .eq(
+          'seguido_id',
+          id
+        )
 
-      setFollowersCount(followers || 0)
+      setFollowersCount(
+        followers || 0
+      )
 
-      const { count: following } = await supabase
+      /*
+        =====================================================
+        SEGUINDO
+        =====================================================
+      */
+
+      const {
+        count: following
+      } = await supabase
         .from('seguidores')
         .select('*', {
           count: 'exact',
           head: true
         })
-        .eq('seguidor_id', id)
+        .eq(
+          'seguidor_id',
+          id
+        )
 
-      setFollowingCount(following || 0)
+      setFollowingCount(
+        following || 0
+      )
+
+      /*
+        =====================================================
+        VERIFICAR FOLLOW
+        =====================================================
+      */
 
       if (user && !isMe) {
-        const { data: follow } = await supabase
+        const {
+          data: follow
+        } = await supabase
           .from('seguidores')
           .select('id')
-          .eq('seguidor_id', user.id)
-          .eq('seguido_id', id)
+          .eq(
+            'seguidor_id',
+            user.id
+          )
+          .eq(
+            'seguido_id',
+            id
+          )
           .maybeSingle()
 
-        setIsFollowing(!!follow)
+        setIsFollowing(
+          !!follow
+        )
       } else {
         setIsFollowing(false)
       }
@@ -159,6 +311,12 @@ export default function ProfilePage() {
 
     fetchProfile()
   }, [id, user?.id])
+
+  /*
+    =====================================================
+    LISTA DE SEGUIDORES / SEGUINDO
+    =====================================================
+  */
 
   const openUserList = async type => {
     setUserListType(type)
@@ -175,7 +333,10 @@ export default function ProfilePage() {
         ? 'seguidor_id'
         : 'seguido_id'
 
-    const { data: follows, error } = await supabase
+    const {
+      data: follows,
+      error
+    } = await supabase
       .from('seguidores')
       .select(targetColumn)
       .eq(column, id)
@@ -190,9 +351,11 @@ export default function ProfilePage() {
       return
     }
 
-    const userIds = (follows || []).map(
-      item => item[targetColumn]
-    )
+    const userIds =
+      (follows || []).map(
+        item =>
+          item[targetColumn]
+      )
 
     if (!userIds.length) {
       setUserList([])
@@ -208,7 +371,10 @@ export default function ProfilePage() {
       .select(
         'id, username, full_name, avatar_url'
       )
-      .in('id', userIds)
+      .in(
+        'id',
+        userIds
+      )
 
     if (profilesError) {
       console.error(
@@ -218,29 +384,55 @@ export default function ProfilePage() {
 
       setUserList([])
     } else {
-      setUserList(profiles || [])
+      setUserList(
+        profiles || []
+      )
     }
 
     setLoadingUserList(false)
   }
 
+  /*
+    =====================================================
+    SEGUIR / DEIXAR DE SEGUIR
+    =====================================================
+  */
+
   const handleFollow = async () => {
-    if (!user || isMe || followLoading) return
+    if (
+      !user ||
+      isMe ||
+      followLoading
+    ) {
+      return
+    }
 
     setFollowLoading(true)
 
     if (isFollowing) {
-      const { error } = await supabase
+      const {
+        error
+      } = await supabase
         .from('seguidores')
         .delete()
-        .eq('seguidor_id', user.id)
-        .eq('seguido_id', id)
+        .eq(
+          'seguidor_id',
+          user.id
+        )
+        .eq(
+          'seguido_id',
+          id
+        )
 
       if (!error) {
         setIsFollowing(false)
 
-        setFollowersCount(prev =>
-          Math.max(0, prev - 1)
+        setFollowersCount(
+          prev =>
+            Math.max(
+              0,
+              prev - 1
+            )
         )
       } else {
         console.error(
@@ -249,16 +441,22 @@ export default function ProfilePage() {
         )
       }
     } else {
-      const { error } = await supabase
+      const {
+        error
+      } = await supabase
         .from('seguidores')
         .insert({
-          seguidor_id: user.id,
+          seguidor_id:
+            user.id,
           seguido_id: id
         })
 
       if (!error) {
         setIsFollowing(true)
-        setFollowersCount(prev => prev + 1)
+
+        setFollowersCount(
+          prev => prev + 1
+        )
       } else {
         console.error(
           'Erro ao seguir usuário:',
@@ -270,13 +468,24 @@ export default function ProfilePage() {
     setFollowLoading(false)
   }
 
+  /*
+    =====================================================
+    EDITAR PERFIL
+    =====================================================
+  */
+
   const handleEditStart = () => {
     setForm({
-      username: profile.username || '',
-      full_name: profile.full_name || '',
-      bio: profile.bio || '',
-      avatar_url: profile.avatar_url || '',
-      banner_url: profile.banner_url || ''
+      username:
+        profile.username || '',
+      full_name:
+        profile.full_name || '',
+      bio:
+        profile.bio || '',
+      avatar_url:
+        profile.avatar_url || '',
+      banner_url:
+        profile.banner_url || ''
     })
 
     setEditing(true)
@@ -284,11 +493,16 @@ export default function ProfilePage() {
 
   const handleCancelEdit = () => {
     setForm({
-      username: profile.username || '',
-      full_name: profile.full_name || '',
-      bio: profile.bio || '',
-      avatar_url: profile.avatar_url || '',
-      banner_url: profile.banner_url || ''
+      username:
+        profile.username || '',
+      full_name:
+        profile.full_name || '',
+      bio:
+        profile.bio || '',
+      avatar_url:
+        profile.avatar_url || '',
+      banner_url:
+        profile.banner_url || ''
     })
 
     setEditing(false)
@@ -298,24 +512,39 @@ export default function ProfilePage() {
     setSaving(true)
 
     const cleanForm = {
-      username: form.username.trim(),
-      full_name: form.full_name.trim(),
-      bio: form.bio.trim(),
-      avatar_url: form.avatar_url.trim(),
-      banner_url: form.banner_url.trim()
+      username:
+        form.username.trim(),
+      full_name:
+        form.full_name.trim(),
+      bio:
+        form.bio.trim(),
+      avatar_url:
+        form.avatar_url.trim(),
+      banner_url:
+        form.banner_url.trim()
     }
 
-    const { data, error } =
-      await updateProfile(cleanForm)
+    const {
+      data,
+      error
+    } = await updateProfile(
+      cleanForm
+    )
 
     if (!error) {
       setProfile(data)
+
       setForm({
-        username: data?.username || '',
-        full_name: data?.full_name || '',
-        bio: data?.bio || '',
-        avatar_url: data?.avatar_url || '',
-        banner_url: data?.banner_url || ''
+        username:
+          data?.username || '',
+        full_name:
+          data?.full_name || '',
+        bio:
+          data?.bio || '',
+        avatar_url:
+          data?.avatar_url || '',
+        banner_url:
+          data?.banner_url || ''
       })
 
       setEditing(false)
@@ -329,6 +558,12 @@ export default function ProfilePage() {
     setSaving(false)
   }
 
+  /*
+    =====================================================
+    LOADING
+    =====================================================
+  */
+
   if (loading) {
     return (
       <div className={styles.center}>
@@ -336,6 +571,12 @@ export default function ProfilePage() {
       </div>
     )
   }
+
+  /*
+    =====================================================
+    PERFIL NÃO ENCONTRADO
+    =====================================================
+  */
 
   if (!profile) {
     return (
@@ -345,45 +586,70 @@ export default function ProfilePage() {
     )
   }
 
-  const avgRating = reviews.length
-    ? (
-        reviews.reduce(
-          (s, r) => s + r.rating,
-          0
-        ) / reviews.length
-      ).toFixed(1)
-    : null
+  /*
+    =====================================================
+    ESTATÍSTICAS
+    =====================================================
+  */
 
-  const memberSince = profile.created_at
-    ? new Date(
-        profile.created_at
-      ).toLocaleDateString(
-        'pt-BR',
-        {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        }
-      )
-    : null
+  const totalReviews =
+    reviews.length +
+    musicReviews.length
+
+  const avgRating =
+    reviews.length
+      ? (
+          reviews.reduce(
+            (s, r) =>
+              s +
+              Number(
+                r.rating
+              ),
+            0
+          ) /
+          reviews.length
+        ).toFixed(1)
+      : null
+
+  const memberSince =
+    profile.created_at
+      ? new Date(
+          profile.created_at
+        ).toLocaleDateString(
+          'pt-BR',
+          {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+          }
+        )
+      : null
 
   return (
     <div className={styles.page}>
 
       <button
         className={styles.back}
-        onClick={() => navigate(-1)}
+        onClick={() =>
+          navigate(-1)
+        }
       >
         <ChevronLeftIcon size={18} />
         Voltar
       </button>
 
-      <div className={styles.profileCard}>
+      <div
+        className={
+          styles.profileCard
+        }
+      >
 
         {/* BANNER */}
 
         <div
-          className={styles.profileBanner}
+          className={
+            styles.profileBanner
+          }
           style={
             profile.banner_url
               ? {
@@ -403,20 +669,31 @@ export default function ProfilePage() {
 
         {/* CONTEÚDO */}
 
-        <div className={styles.profileContent}>
+        <div
+          className={
+            styles.profileContent
+          }
+        >
 
           {/* AVATAR */}
 
-          <div className={styles.avatarBig}>
+          <div
+            className={
+              styles.avatarBig
+            }
+          >
             {profile.avatar_url ? (
               <img
-                src={profile.avatar_url}
+                src={
+                  profile.avatar_url
+                }
                 alt=""
               />
             ) : (
               <span>
                 {(
-                  profile.username || '?'
+                  profile.username ||
+                  '?'
                 )[0].toUpperCase()}
               </span>
             )}
@@ -424,15 +701,23 @@ export default function ProfilePage() {
 
           {!editing ? (
 
-            /* =========================
-               PERFIL NORMAL
-            ========================= */
+            <div
+              className={
+                styles.profileInfo
+              }
+            >
 
-            <div className={styles.profileInfo}>
+              <div
+                className={
+                  styles.nameRow
+                }
+              >
 
-              <div className={styles.nameRow}>
-
-                <div className={styles.nameBlock}>
+                <div
+                  className={
+                    styles.nameBlock
+                  }
+                >
 
                   <h1
                     className={
@@ -492,7 +777,11 @@ export default function ProfilePage() {
               </div>
 
               {profile.bio && (
-                <p className={styles.bio}>
+                <p
+                  className={
+                    styles.bio
+                  }
+                >
                   {profile.bio}
                 </p>
               )}
@@ -503,20 +792,29 @@ export default function ProfilePage() {
                     styles.memberSince
                   }
                 >
-                  Membro desde {memberSince}
+                  Membro desde{' '}
+                  {memberSince}
                 </p>
               )}
 
-              <div className={styles.stats}>
+              <div
+                className={
+                  styles.stats
+                }
+              >
 
-                <div className={styles.stat}>
+                <div
+                  className={
+                    styles.stat
+                  }
+                >
 
                   <span
                     className={
                       styles.statNum
                     }
                   >
-                    {reviews.length}
+                    {totalReviews}
                   </span>
 
                   <span
@@ -613,17 +911,18 @@ export default function ProfilePage() {
 
           ) : (
 
-            /* =========================
-               EDITAR PERFIL
-            ========================= */
-
-            <div className={styles.editForm}>
+            <div
+              className={
+                styles.editForm
+              }
+            >
 
               <div
                 className={
                   styles.editHeader
                 }
               >
+
                 <div>
 
                   <h2
@@ -644,6 +943,7 @@ export default function ProfilePage() {
                   </p>
 
                 </div>
+
               </div>
 
               {/* PERFIL */}
@@ -659,7 +959,9 @@ export default function ProfilePage() {
                     styles.editSectionHeader
                   }
                 >
-                  <h3>Perfil</h3>
+                  <h3>
+                    Perfil
+                  </h3>
 
                   <span>
                     Informações básicas da
@@ -689,11 +991,13 @@ export default function ProfilePage() {
                         form.full_name
                       }
                       onChange={e =>
-                        setForm(f => ({
-                          ...f,
-                          full_name:
-                            e.target.value
-                        }))
+                        setForm(
+                          f => ({
+                            ...f,
+                            full_name:
+                              e.target.value
+                          })
+                        )
                       }
                       className={
                         styles.input
@@ -718,11 +1022,13 @@ export default function ProfilePage() {
                         form.username
                       }
                       onChange={e =>
-                        setForm(f => ({
-                          ...f,
-                          username:
-                            e.target.value
-                        }))
+                        setForm(
+                          f => ({
+                            ...f,
+                            username:
+                              e.target.value
+                          })
+                        )
                       }
                       className={
                         styles.input
@@ -759,12 +1065,16 @@ export default function ProfilePage() {
                     styles.editSectionHeader
                   }
                 >
-                  <h3>Imagens</h3>
+
+                  <h3>
+                    Imagens
+                  </h3>
 
                   <span>
                     Personalize seu avatar
                     e banner
                   </span>
+
                 </div>
 
                 <div
@@ -786,6 +1096,7 @@ export default function ProfilePage() {
                         styles.imageEditTitle
                       }
                     >
+
                       <strong>
                         Avatar
                       </strong>
@@ -793,6 +1104,7 @@ export default function ProfilePage() {
                       <span>
                         Foto do perfil
                       </span>
+
                     </div>
 
                     <div
@@ -800,6 +1112,7 @@ export default function ProfilePage() {
                         styles.avatarEditPreview
                       }
                     >
+
                       {form.avatar_url ? (
                         <img
                           src={
@@ -815,6 +1128,7 @@ export default function ProfilePage() {
                           )[0].toUpperCase()}
                         </span>
                       )}
+
                     </div>
 
                     <input
@@ -823,11 +1137,13 @@ export default function ProfilePage() {
                         form.avatar_url
                       }
                       onChange={e =>
-                        setForm(f => ({
-                          ...f,
-                          avatar_url:
-                            e.target.value
-                        }))
+                        setForm(
+                          f => ({
+                            ...f,
+                            avatar_url:
+                              e.target.value
+                          })
+                        )
                       }
                       className={
                         styles.input
@@ -849,6 +1165,7 @@ export default function ProfilePage() {
                         styles.imageEditTitle
                       }
                     >
+
                       <strong>
                         Banner
                       </strong>
@@ -857,6 +1174,7 @@ export default function ProfilePage() {
                         Imagem exibida no
                         topo do perfil
                       </span>
+
                     </div>
 
                     <div
@@ -864,6 +1182,7 @@ export default function ProfilePage() {
                         styles.bannerEditPreview
                       }
                     >
+
                       {form.banner_url ? (
                         <img
                           src={
@@ -880,6 +1199,7 @@ export default function ProfilePage() {
                           Sem banner
                         </div>
                       )}
+
                     </div>
 
                     <input
@@ -888,11 +1208,13 @@ export default function ProfilePage() {
                         form.banner_url
                       }
                       onChange={e =>
-                        setForm(f => ({
-                          ...f,
-                          banner_url:
-                            e.target.value
-                        }))
+                        setForm(
+                          f => ({
+                            ...f,
+                            banner_url:
+                              e.target.value
+                          })
+                        )
                       }
                       className={
                         styles.input
@@ -918,6 +1240,7 @@ export default function ProfilePage() {
                     styles.editSectionHeader
                   }
                 >
+
                   <h3>
                     Sobre você
                   </h3>
@@ -926,6 +1249,7 @@ export default function ProfilePage() {
                     Conte um pouco sobre
                     você
                   </span>
+
                 </div>
 
                 <div
@@ -934,16 +1258,21 @@ export default function ProfilePage() {
                   }
                 >
 
-                  <label>Bio</label>
+                  <label>
+                    Bio
+                  </label>
 
                   <textarea
                     placeholder="Escreva algo sobre você..."
                     value={form.bio}
                     onChange={e =>
-                      setForm(f => ({
-                        ...f,
-                        bio: e.target.value
-                      }))
+                      setForm(
+                        f => ({
+                          ...f,
+                          bio:
+                            e.target.value
+                        })
+                      )
                     }
                     className={
                       styles.textarea
@@ -1006,50 +1335,157 @@ export default function ProfilePage() {
 
       </div>
 
-      {/* AVALIAÇÕES */}
+      {/* =================================================
+          SEÇÕES DE AVALIAÇÕES
+         ================================================= */}
 
-      {reviews.length > 0 && (
+      <div className={styles.reviewTabs}>
+
+        <button
+          type="button"
+          className={`${styles.reviewTab} ${
+            activeSection === 'games'
+              ? styles.reviewTabActive
+              : ''
+          }`}
+          onClick={() =>
+            setActiveSection('games')
+          }
+        >
+          Jogos
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.reviewTab} ${
+            activeSection === 'music'
+              ? styles.reviewTabActive
+              : ''
+          }`}
+          onClick={() =>
+            setActiveSection('music')
+          }
+        >
+          Músicas
+        </button>
+
+      </div>
+
+      {/* =================================================
+          AVALIAÇÕES DE JOGOS
+         ================================================= */}
+
+      {activeSection === 'games' && (
         <div
           className={
             styles.reviewsSection
           }
         >
 
-          <h2
-            className={
-              styles.sectionTitle
-            }
-          >
-            Avaliações
-          </h2>
+          {reviews.length > 0 ? (
+            <>
+              <h2
+                className={
+                  styles.sectionTitle
+                }
+              >
+                Avaliações de jogos
+              </h2>
 
-          <div className={styles.grid}>
+              <div
+                className={
+                  styles.grid
+                }
+              >
 
-            {reviews.map(r => (
-              <ReviewCard
-                key={r.id}
-                review={r}
-                reactions={reactions.filter(
-                  rx =>
-                    rx.review_id === r.id
-                )}
-              />
-            ))}
+                {reviews.map(r => (
+                  <ReviewCard
+                    key={r.id}
+                    review={r}
+                    reactions={reactions.filter(
+                      rx =>
+                        rx.review_id ===
+                        r.id
+                    )}
+                  />
+                ))}
 
-          </div>
+              </div>
+            </>
+          ) : (
+            <p
+              className={
+                styles.empty
+              }
+            >
+              Nenhuma avaliação de jogo publicada
+              ainda.
+            </p>
+          )}
 
         </div>
       )}
 
-      {reviews.length === 0 &&
-        !loading && (
-          <p className={styles.empty}>
-            Nenhuma avaliação publicada
-            ainda.
-          </p>
-        )}
+      {/* =================================================
+          AVALIAÇÕES MUSICAIS
+         ================================================= */}
 
-      {/* MODAL DE SEGUIDORES */}
+      {activeSection === 'music' && (
+        <div
+          className={
+            styles.reviewsSection
+          }
+        >
+
+          {musicReviews.length > 0 ? (
+            <>
+              <h2
+                className={
+                  styles.sectionTitle
+                }
+              >
+                Avaliações musicais
+              </h2>
+
+              <div
+                className={
+                  styles.grid
+                }
+              >
+
+                {musicReviews.map(
+                  review => (
+                    <MusicReviewCard
+                      key={review.id}
+                      review={review}
+                      reactions={musicReactions.filter(
+                        reaction =>
+                          reaction.music_review_id ===
+                          review.id
+                      )}
+                    />
+                  )
+                )}
+
+              </div>
+            </>
+          ) : (
+            <p
+              className={
+                styles.empty
+              }
+            >
+              Nenhuma avaliação musical publicada
+              ainda.
+            </p>
+          )}
+
+        </div>
+      )}
+
+      {/* =================================================
+          MODAL DE SEGUIDORES
+         ================================================= */}
 
       {userListType && (
         <div
@@ -1099,7 +1535,9 @@ export default function ProfilePage() {
                   styles.closeModal
                 }
                 onClick={() =>
-                  setUserListType(null)
+                  setUserListType(
+                    null
+                  )
                 }
               >
                 ×
@@ -1121,7 +1559,8 @@ export default function ProfilePage() {
                 >
                   <SpinnerIcon size={22} />
                 </div>
-              ) : userList.length === 0 ? (
+              ) : userList.length ===
+                0 ? (
                 <div
                   className={
                     styles.userListEmpty
@@ -1133,64 +1572,70 @@ export default function ProfilePage() {
                     : 'Não segue ninguém ainda.'}
                 </div>
               ) : (
-                userList.map(profile => (
-                  <button
-                    key={profile.id}
-                    className={
-                      styles.userListItem
-                    }
-                    onClick={() => {
-                      setUserListType(
-                        null
-                      )
-
-                      navigate(
-                        `/profile/${profile.id}`
-                      )
-                    }}
-                  >
-
-                    <div
-                      className={
-                        styles.userListAvatar
+                userList.map(
+                  profile => (
+                    <button
+                      key={
+                        profile.id
                       }
+                      className={
+                        styles.userListItem
+                      }
+                      onClick={() => {
+                        setUserListType(
+                          null
+                        )
+
+                        navigate(
+                          `/profile/${profile.id}`
+                        )
+                      }}
                     >
-                      {profile.avatar_url ? (
-                        <img
-                          src={
-                            profile.avatar_url
-                          }
-                          alt=""
-                        />
-                      ) : (
+
+                      <div
+                        className={
+                          styles.userListAvatar
+                        }
+                      >
+
+                        {profile.avatar_url ? (
+                          <img
+                            src={
+                              profile.avatar_url
+                            }
+                            alt=""
+                          />
+                        ) : (
+                          <span>
+                            {(
+                              profile.username ||
+                              '?'
+                            )[0].toUpperCase()}
+                          </span>
+                        )}
+
+                      </div>
+
+                      <div
+                        className={
+                          styles.userListInfo
+                        }
+                      >
+
+                        <strong>
+                          {profile.full_name ||
+                            profile.username}
+                        </strong>
+
                         <span>
-                          {(
-                            profile.username ||
-                            '?'
-                          )[0].toUpperCase()}
+                          @{profile.username}
                         </span>
-                      )}
-                    </div>
 
-                    <div
-                      className={
-                        styles.userListInfo
-                      }
-                    >
+                      </div>
 
-                      <strong>
-                        {profile.full_name ||
-                          profile.username}
-                      </strong>
-
-                      <span>
-                        @{profile.username}
-                      </span>
-
-                    </div>
-
-                  </button>
-                ))
+                    </button>
+                  )
+                )
               )}
 
             </div>

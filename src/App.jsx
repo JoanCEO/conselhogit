@@ -8,6 +8,8 @@ import ConvocacoesPage from './pages/ConvocacoesPage'
 import LinksPage from './pages/LinksPage'
 import AuthPage from './pages/AuthPage'
 import JulgamentoPage from './pages/JulgamentoPage'
+import MusicReviewPage from './pages/MusicReviewPage'
+import MusicPage from './pages/MusicPage'
 import LoadingScreen from './components/LoadingScreen'
 
 function ProtectedRoute({ children }) {
@@ -41,6 +43,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
+
         <Route
           index
           element={<HomePage />}
@@ -69,6 +72,16 @@ export default function App() {
         <Route
           path="julgamento"
           element={<JulgamentoPage />}
+        />
+
+        <Route
+          path="musicas"
+          element={<MusicPage />}
+        />
+
+        <Route
+          path="musica/:id"
+          element={<MusicReviewPage />}
         />
 
       </Route>
