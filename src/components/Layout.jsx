@@ -60,6 +60,11 @@ export default function Layout() {
       icon: <GavelIcon size={17} />
     },
     {
+      label: 'Novidades',
+      path: '/novidades',
+      icon: <MegaphoneIcon size={17} />
+    },
+    {
       label: 'Links',
       path: '/links',
       icon: <LinkIcon size={17} />

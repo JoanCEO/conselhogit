@@ -10,6 +10,7 @@ import AuthPage from './pages/AuthPage'
 import JulgamentoPage from './pages/JulgamentoPage'
 import MusicReviewPage from './pages/MusicReviewPage'
 import MusicPage from './pages/MusicPage'
+import NovidadesPage from './pages/NovidadesPage'
 import LoadingScreen from './components/LoadingScreen'
 
 function ProtectedRoute({ children }) {
@@ -72,6 +73,11 @@ export default function App() {
         <Route
           path="julgamento"
           element={<JulgamentoPage />}
+        />
+
+        <Route
+          path="novidades"
+          element={<NovidadesPage />}
         />
 
         <Route

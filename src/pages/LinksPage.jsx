@@ -8,6 +8,7 @@ const LINKS = [
       { name: 'CS.MONEY', desc: 'Marketplace de skins confiável, compra e venda com segurança.', url: 'https://cs.money', tag: 'Skins' },
       { name: 'CS:GO Skins', desc: 'Marketplace e plataforma para compra e venda de skins de CS.', url: 'https://csgo-skins.com', tag: 'Skins' },
       { name: 'SkinsMonkeys', desc: 'Plataforma para negociação e troca de skins de CS.', url: 'https://skinsmonkey.com', tag: 'Skins' },
+      { name: 'BRSkins', desc: 'Marketplace brasileiro para compra, venda e troca de skins de CS2, com variedade de itens e preços competitivos.', url: 'https://brskins.gg', tag: 'Skins' },
       { name: 'NeshaStore', desc: 'Loja e marketplace de skins para jogadores de Counter-Strike.', url: 'https://neshastore.com', tag: 'Skins' },
       { name: 'SkinPlace', desc: 'Marketplace de skins de CS2 para compra, venda e troca de itens..', url: 'https://skin.place', tag: 'Skins' },
       { name: 'Upgrader', desc: 'Plataforma de upgrade e troca de skins de Counter-Strike.', url: 'https://upgrader.pro', tag: 'Upgrade' },
