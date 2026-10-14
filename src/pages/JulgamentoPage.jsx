@@ -613,6 +613,81 @@ export default function JulgamentoPage() {
     =========================
   */
 
+  const gerarAta = () => {
+    if (!julgamentoAtivo) return
+
+    const escaparHtml = (valor) =>
+      String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+
+    const dataHora = (data) =>
+      new Date(data).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+
+    const mensagensHtml = mensagens.map((item) => `
+      <article class=\"mensagem\">
+        <strong>${escaparHtml(obterNome(item.profiles))}</strong>
+        <time>${escaparHtml(dataHora(item.created_at))}</time>
+        <p>${escaparHtml(item.mensagem).replace(/\n/g, '<br>')}</p>
+      </article>
+    `).join('')
+
+    const votosHtml = votos.map((item) => `
+      <tr>
+        <td>${escaparHtml(obterNome(item.profiles))}</td>
+        <td>${item.voto === 'sim' ? 'Sim' : 'Não'}</td>
+        <td>${escaparHtml(dataHora(item.created_at))}</td>
+      </tr>
+    `).join('')
+
+    const documento = `<!DOCTYPE html>
+      <html lang=\"pt-BR\">
+      <head>
+        <meta charset=\"UTF-8\">
+        <title>Ata - ${escaparHtml(julgamentoAtivo.titulo)}</title>
+        <style>
+          body{font-family:Arial,sans-serif;color:#222;max-width:900px;margin:40px auto;padding:0 24px;line-height:1.5}
+          h1{margin-bottom:8px} h2{margin-top:32px;border-bottom:1px solid #ddd;padding-bottom:8px}
+          .subtitulo{color:#555} .mensagem{padding:12px 0;border-bottom:1px solid #eee;break-inside:avoid}
+          .mensagem strong{margin-right:12px}.mensagem time{font-size:12px;color:#666}.mensagem p{margin:6px 0 0;white-space:normal;overflow-wrap:anywhere}
+          table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #ddd}
+          @media print{body{margin:0 auto;padding:0 10px}}
+        </style>
+      </head>
+      <body>
+        <h1>Ata do Julgamento — Conselho Blaze</h1>
+        <h2>${escaparHtml(julgamentoAtivo.titulo)}</h2>
+        <p class=\"subtitulo\">${escaparHtml(julgamentoAtivo.assunto)}</p>
+        <p><strong>Status:</strong> Encerrado</p>
+        <p><strong>Documento gerado em:</strong> ${escaparHtml(dataHora(new Date()))}</p>
+        <h2>Resultado da votação</h2>
+        <p><strong>Sim:</strong> ${votosSim} voto(s) (${porcentagemSim}%)</p>
+        <p><strong>Não:</strong> ${votosNao} voto(s) (${porcentagemNao}%)</p>
+        <table><thead><tr><th>Integrante</th><th>Voto</th><th>Data e horário</th></tr></thead><tbody>${votosHtml || '<tr><td colspan=\"3\">Nenhum voto registrado.</td></tr>'}</tbody></table>
+        <h2>Transcrição completa do chat (${mensagens.length} mensagens)</h2>
+        ${mensagensHtml || '<p>Nenhuma mensagem foi registrada.</p>'}
+        <script>window.onload = () => window.print();</script>
+      </body></html>`
+
+    const janela = window.open('', '_blank')
+    if (!janela) {
+      alert('Permita pop-ups para gerar a ata do julgamento.')
+      return
+    }
+    janela.document.open()
+    janela.document.write(documento)
+    janela.document.close()
+  }
+
   const selecionarJulgamento = (
     julgamento
   ) => {
@@ -1617,6 +1692,20 @@ export default function JulgamentoPage() {
                 permanece disponível para
                 consulta.
               </p>
+
+              <div className={styles.voteLog}>
+                <div className={styles.voteLogTitle}>ATA DO JULGAMENTO</div>
+                <p>Gere um documento com o histórico completo das mensagens e o registro final da votação.</p>
+                <button
+                  type="button"
+                  className={styles.createButton}
+                  onClick={gerarAta}
+                  disabled={loadingMensagens || loadingVotos}
+                >
+                  {loadingMensagens || loadingVotos ? 'Carregando registros...' : 'Gerar ata / Salvar como PDF'}
+                </button>
+                <p>Ao abrir a janela de impressão, escolha <strong>Salvar como PDF</strong> para guardar ou compartilhar a ata.</p>
+              </div>
 
               <div
                 className={styles.results}
